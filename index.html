@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1410">
+<title>작명연구소 — 사람·반려동물·회사 작명소</title>
+<meta name="description" content="신생아·개명·반려동물·회사·가게·팀 이름까지. 사주 오행과 어감, 시대성·희소성을 한 번에 분석해 의미 있는 이름을 받아보세요.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="작명연구소 — 의미 있는 이름을 받는 곳">
+<meta property="og:description" content="신생아·개명·반려동물·회사·가게·팀 이름을 한 곳에서. 사주·오행·어감을 함께 본 결과를 카드로 받아보세요.">
+<meta property="og:locale" content="ko_KR">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ─── 토큰 ─── */
+:root {
+  --paper: #1a1410;
+  --paper-deep: #0e0b07;
+  --ink: #f0e6d2;
+  --ink-soft: #b8a987;
+  --muted: #786a52;
+  --accent: #e8553b;        /* 단청 코랄 */
+  --accent-soft: #c95a2e;
+  --accent-glow: rgba(232, 85, 59, 0.35);
+  --teal: #3fa874;           /* 청록 */
+  --teal-glow: rgba(63, 168, 116, 0.3);
+  --gold: #d4a849;
+  --card: #25201a;
+  --card-elev: #2e2820;
+  --card-border: #3d352a;
+  --hanji-fiber: rgba(180, 145, 90, 0.06);
+  --shadow: rgba(0, 0, 0, 0.55);
+  --tab-person: #e8553b;
+  --tab-pet:    #d4a849;
+  --tab-comp:   #3fa874;
+}
+[data-theme="light"] {
+  --paper: #f6efdc;
+  --paper-deep: #ecdfbf;
+  --ink: #2a2118;
+  --ink-soft: #5b4a36;
+  --muted: #9a8a6e;
+  --accent: #c95a2e;
+  --accent-soft: #e88860;
+  --accent-glow: rgba(201, 90, 46, 0.25);
+  --teal: #2e8b5c;
+  --teal-glow: rgba(46, 139, 92, 0.22);
+  --gold: #b88a35;
+  --card: #fffaee;
+  --card-elev: #ffffff;
+  --card-border: #d8c79a;
+  --hanji-fiber: rgba(120, 90, 40, 0.05);
+  --shadow: rgba(67, 42, 14, 0.18);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% -10%, var(--accent-glow) 0%, transparent 35%),
+    radial-gradient(circle at 92% 110%, var(--teal-glow) 0%, transparent 45%),
+    repeating-linear-gradient(135deg, var(--hanji-fiber) 0 2px, transparent 2px 6px),
+    var(--paper);
+  background-attachment: fixed;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ─── 헤더 ─── */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+}
+.brand .seal {
+  display: inline-grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff8e8;
+  font-family: 'Gowun Batang', serif;
+  font-weight: 700;
+  font-size: 22px;
+  box-shadow: 0 6px 18px var(--accent-glow);
+  transform: rotate(-3deg);
+}
+.brand h1 {
+  font-family: 'Gowun Batang', 'Noto Sans KR', serif;
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.brand h1 .sub {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 18px;
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+#theme-toggle {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  transition: 0.2s;
+}
+#theme-toggle:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+/* ─── 탭 네비 ─── */
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 4px;
+  padding: 10px 28px;
+  background:
+    linear-gradient(to bottom, var(--paper) 70%, transparent);
+  backdrop-filter: blur(8px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.2s;
+  border-radius: 8px 8px 0 0;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--accent); background: var(--card); }
+.tab-btn[data-tab="person"].active { border-bottom-color: var(--tab-person); }
+.tab-btn[data-tab="pet"].active { border-bottom-color: var(--tab-pet); }
+.tab-btn[data-tab="company"].active { border-bottom-color: var(--tab-comp); }
+.tab-btn .num {
+  display: inline-block;
+  width: 22px; height: 22px;
+  line-height: 22px;
+  text-align: center;
+  font-family: 'Gowun Batang', serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--card-elev);
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+/* ─── 메인 ─── */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 28px 80px;
+}
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fade 0.28s ease both; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ─── 홈 인트로 ─── */
+.intro h2 {
+  font-family: 'Gowun Batang', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin: 14px 0 6px;
+}
+.intro h2 .stamp {
+  display: inline-block;
+  font-family: 'Nanum Pen Script', cursive;
+  color: var(--accent);
+  transform: rotate(-4deg);
+  font-size: 0.7em;
+  margin-left: 6px;
+}
+.intro .lead {
+  color: var(--ink-soft);
+  font-size: 17px;
+  margin: 0 0 28px;
+  max-width: 640px;
+}
+.intro .lead em {
+  font-style: normal;
+  color: var(--ink);
+  background: linear-gradient(transparent 55%, var(--accent-glow) 55%);
+  padding: 0 2px;
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+.home-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 24px 22px 22px;
+  box-shadow: 0 10px 30px var(--shadow);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  overflow: hidden;
+}
+.home-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--cardc);
+}
+.home-card[data-go="person"]  { --cardc: var(--tab-person); }
+.home-card[data-go="pet"]     { --cardc: var(--tab-pet); }
+.home-card[data-go="company"] { --cardc: var(--tab-comp); }
+.home-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px var(--shadow);
+  border-color: var(--cardc);
+}
+.home-card .ico {
+  display: inline-grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  background: color-mix(in srgb, var(--cardc) 18%, transparent);
+  color: var(--cardc);
+  border-radius: 10px;
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.home-card h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 22px;
+  margin: 4px 0 8px;
+}
+.home-card p { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 14px; }
+.home-card .feats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.home-card .feats span {
+  background: var(--card-elev);
+  color: var(--ink-soft);
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+}
+.home-card .go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  color: var(--cardc);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.intro-note {
+  margin-top: 38px;
+  padding: 18px 20px;
+  background: var(--card);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+}
+.intro-note b { color: var(--ink); }
+
+/* ─── 폼 ─── */
+.form {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 26px 24px;
+  box-shadow: 0 10px 24px var(--shadow);
+}
+.form h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 20px;
+  margin: 0 0 4px;
+}
+.form .sub {
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+  font-size: 14px;
+}
+.field {
+  display: block;
+  margin-bottom: 16px;
+}
+.field > label {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.field input[type="text"],
+.field input[type="number"],
+.field select {
+  width: 100%;
+  background: var(--card-elev);
+  color: var(--ink);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 14px;
+}
+.checks label { color: var(--ink-soft); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.checks input[type="radio"], .checks input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.chip {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13.5px;
+  transition: 0.15s;
+}
+.chip:hover { color: var(--ink); border-color: var(--ink-soft); }
+.chip.on { background: var(--accent); color: #fff8e8; border-color: var(--accent); }
+
+small.hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+small.hint.ok { color: var(--teal); }
+small.hint.warn { color: var(--gold); }
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+.pill.ok { background: color-mix(in srgb, var(--teal) 18%, transparent); color: var(--teal); }
+.pill.warn { background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold); }
+
+.submit {
+  background: var(--accent);
+  color: #fff8e8;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 22px;
+  font-size: 15.5px;
+  font-weight: 700;
+  margin-top: 10px;
+  width: 100%;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 20px var(--accent-glow);
+  transition: 0.2s;
+}
+.submit:hover { transform: translateY(-2px); box-shadow: 0 12px 26px var(--accent-glow); }
+
+.tab-pane[data-tab="pet"] .submit { background: var(--tab-pet); box-shadow: 0 8px 20px color-mix(in srgb, var(--tab-pet) 30%, transparent); }
+.tab-pane[data-tab="company"] .submit { background: var(--tab-comp); box-shadow: 0 8px 20px color-mix(in srgb, var(--tab-comp) 30%, transparent); }
+
+/* ─── 결과 ─── */
+.out { margin-top: 26px; }
+.loading {
+  display: grid;
+  place-items: center;
+  padding: 60px 20px;
+  color: var(--ink-soft);
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 22px;
+}
+.brush {
+  width: 60px; height: 8px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  animation: brush 1.2s ease-in-out infinite;
+}
+@keyframes brush { 0%,100% { transform: scaleX(0.6); } 50% { transform: scaleX(1.4); } }
+
+.result-block { animation: fade 0.4s ease both; }
+.result-h {
+  font-family: 'Gowun Batang', serif;
+  font-size: 22px;
+  margin: 0 0 4px;
+}
+.result-sub { color: var(--ink-soft); margin: 0 0 18px; font-size: 14px; }
+
+.saju-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 12px 12px 0;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+}
+.saju-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  font-size: 14.5px;
+}
+.saju-row .lbl {
+  display: inline-block;
+  min-width: 50px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+.saju-row b { color: var(--accent); font-weight: 600; }
+.oh-bars { display: inline-flex; gap: 10px; align-items: flex-end; }
+.oh-bar { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.oh-bar i { display: block; width: 16px; background: var(--c); border-radius: 3px 3px 0 0; transition: 0.4s; }
+.oh-bar b { font-size: 11px; color: var(--ink-soft); font-weight: 400; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.name-card, .pet-card, .comp-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 6px 18px var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: 0.2s;
+}
+.name-card:hover, .pet-card:hover, .comp-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px var(--shadow);
+}
+
+.nc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.nc-han { margin: 0; line-height: 1.15; font-family: 'Gowun Batang', serif; font-weight: 700; }
+.nc-han .hanja {
+  display: block;
+  font-size: 26px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+.nc-han .kor { font-size: 24px; color: var(--ink); letter-spacing: -0.02em; }
+.nc-score {
+  background: var(--card-elev);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-family: 'Gowun Batang', serif;
+  color: var(--accent);
+}
+.nc-score small { font-weight: 400; color: var(--ink-soft); }
+.nc-meaning {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  margin: 12px 0 4px;
+}
+.nc-first {
+  font-family: 'Nanum Pen Script', cursive;
+  color: var(--ink);
+  font-size: 17px;
+  margin: 6px 0 14px;
+  padding: 8px 12px;
+  background: var(--card-elev);
+  border-radius: 8px;
+  line-height: 1.4;
+}
+.nc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.nc-grid > div {
+  background: var(--card-elev);
+  border-radius: 6px;
+  padding: 6px 4px;
+  text-align: center;
+}
+.nc-grid span { display: block; font-size: 11px; color: var(--muted); }
+.nc-grid b { font-size: 14px; color: var(--ink); }
+.nc-detail { margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+.nc-detail summary { cursor: pointer; padding: 4px 0; color: var(--ink-soft); }
+.nc-detail ul { margin: 8px 0; padding-left: 0; list-style: none; }
+.nc-detail li { padding: 3px 0; }
+.nc-detail b { color: var(--ink); font-weight: 500; margin-right: 6px; }
+
+/* 반려동물 카드 */
+.pet-card header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.pet-card h4 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 24px;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.pet-card h4 small {
+  font-family: 'Nanum Pen Script', cursive;
+  color: var(--ink-soft);
+  font-size: 16px;
+  font-weight: 400;
+}
+.badge {
+  background: var(--card-elev);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.pet-yulae {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 12px 0 14px;
+  line-height: 1.5;
+}
+.pet-card .nc-grid { grid-template-columns: 1fr 1fr; }
+
+/* 회사·팀 카드 */
+.comp-card header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.comp-card h4 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.slogan {
+  margin: 12px 0 8px;
+  color: var(--ink);
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.motif {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 6px 0 8px;
+}
+.comp-card details {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.comp-card details summary { cursor: pointer; }
+.comp-card ul { margin: 8px 0; padding-left: 16px; }
+
+.actions { margin: 28px 0; text-align: center; }
+.redo-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-size: 14px;
+  transition: 0.18s;
+}
+.redo-btn:hover { color: var(--ink); border-color: var(--accent); }
+
+/* FAQ */
+.faq {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid var(--card-border);
+}
+.faq h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 20px;
+  margin: 0 0 18px;
+}
+.faq details {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+}
+.faq summary { cursor: pointer; font-weight: 500; }
+.faq p { color: var(--ink-soft); margin: 10px 0 0; font-size: 14.5px; line-height: 1.65; }
+
+footer {
+  margin-top: 80px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+footer .signature {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+  .site-header { padding: 14px 18px; }
+  .tabs { padding: 8px 12px; }
+  .tab-btn { font-size: 13px; padding: 10px 6px; }
+  .tab-btn .num { display: none; }
+  main { padding: 16px 18px 60px; }
+  .home-card { padding: 20px 18px; }
+  .form { padding: 20px 16px; }
+  .nc-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">
+    <span class="seal">名</span>
+    <h1>작명연구소<span class="sub">— 이름 짓는 자리</span></h1>
+  </a>
+  <button id="theme-toggle" aria-label="다크/라이트">먹↔한지</button>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" data-tab="home" role="tab"><span class="num">序</span>처음</button>
+  <button class="tab-btn" data-tab="person" role="tab"><span class="num">一</span>인물·개명</button>
+  <button class="tab-btn" data-tab="pet" role="tab"><span class="num">二</span>반려동물</button>
+  <button class="tab-btn" data-tab="company" role="tab"><span class="num">三</span>회사·가게·팀</button>
+</nav>
+
+<main>
+
+<!-- 홈 -->
+<section class="tab-pane active" data-tab="home">
+  <div class="intro">
+    <h2>받아 든 이름은 <em>한참 두고 봐도 좋아야 한다.</em><span class="stamp">名</span></h2>
+    <p class="lead">한자 한 자, 음절 하나에 사주의 빈 자리와 어감의 결, 시대의 호흡을 모두 따져 봅니다. 사람·반려동물·회사·가게·팀 — 무엇이든, 부르면 손에 잡힐 듯한 이름을 만들어 드려요.</p>
+  </div>
+
+  <div class="home-grid">
+    <article class="home-card" data-go="person">
+      <span class="ico">人</span>
+      <h3>인물·개명</h3>
+      <p>신생아 작명, 개명 — 사주 오행을 보고 부족한 기운을 채워줄 한자를 골라드립니다.</p>
+      <div class="feats">
+        <span>사주 분석</span><span>한자 자원오행</span><span>발음·시대성</span><span>항렬자 지원</span>
+      </div>
+      <div class="go">시작하기 →</div>
+    </article>
+
+    <article class="home-card" data-go="pet">
+      <span class="ico">寵</span>
+      <h3>반려동물</h3>
+      <p>품종·털색·성격까지 본 후 컨셉별로 추천. 부르기 좋은 순으로 정렬해 드려요.</p>
+      <div class="feats">
+        <span>한식·디저트</span><span>한국식 옛이름</span><span>병원 호명 친화</span><span>친근형 자동</span>
+      </div>
+      <div class="go">시작하기 →</div>
+    </article>
+
+    <article class="home-card" data-go="company">
+      <span class="ico">店</span>
+      <h3>회사·가게·팀</h3>
+      <p>업종·이미지·키워드로 합성. 슬로건과 도메인 후보, 로고 모티프까지 한 카드에.</p>
+      <div class="feats">
+        <span>한글·영문</span><span>슬로건 생성</span><span>도메인 힌트</span><span>팀명 위트 모드</span>
+      </div>
+      <div class="go">시작하기 →</div>
+    </article>
+  </div>
+
+  <div class="intro-note">
+    <b>이름은 기록이 아니라 호흡이라고 생각합니다.</b> 입력값으로 분위기와 사주를 읽고, 한자·어감·시대성·희소성을 함께 본 결과만 카드로 드려요. 작명·개명은 인생을 두고 부르는 일이라, 추천 결과를 받아 본 뒤 마음에 드는 글자를 직접 다듬어 쓰시는 걸 권합니다.
+  </div>
+</section>
+
+<!-- 인물 -->
+<section class="tab-pane" data-tab="person">
+  <form id="person-form" class="form">
+    <h3>인물·개명 작명</h3>
+    <p class="sub" id="person-sub">아직 태어나지 않은 아기는 <b>출산 예정일</b>로, 이미 태어난 분의 개명은 <b>실제 생년월일</b>로 입력해 주세요. 모르면 비워도 됩니다.</p>
+
+    <div class="field">
+      <label>구분</label>
+      <div class="checks">
+        <label><input type="radio" name="구분" value="신생아" checked> 신생아(예정)</label>
+        <label><input type="radio" name="구분" value="개명"> 개명(이미 태어남)</label>
+      </div>
+    </div>
+
+    <div class="field row">
+      <div>
+        <label>성(姓)</label>
+        <input type="text" name="성" placeholder="예) 김">
+      </div>
+      <div>
+        <label>성별</label>
+        <select name="성별">
+          <option value="u">선택 안 함</option>
+          <option value="m">남</option>
+          <option value="f">여</option>
+        </select>
+      </div>
+      <div>
+        <label>음절</label>
+        <select name="음절">
+          <option value="2" selected>두 글자</option>
+          <option value="1">외자(한 글자)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field row" id="person-date-row">
+      <div>
+        <label data-신생아="예정 연도" data-개명="생년">예정 연도</label>
+        <input type="number" name="생년" min="1900" max="2099" placeholder="2026">
+      </div>
+      <div>
+        <label data-신생아="예정 월" data-개명="생월">예정 월</label>
+        <input type="number" name="생월" min="1" max="12" placeholder="6">
+      </div>
+      <div>
+        <label data-신생아="예정 일" data-개명="생일">예정 일</label>
+        <input type="number" name="생일" min="1" max="31" placeholder="15">
+      </div>
+      <div>
+        <label data-신생아="예정 시각 (0~23, 제왕절개 등)" data-개명="출생시간 (0~23)">예정 시각 (0~23, 제왕절개 등)</label>
+        <input type="number" name="생시" min="0" max="23" placeholder="모르면 빈칸">
+      </div>
+    </div>
+    <small class="hint" id="person-date-hint">예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.</small>
+
+    <div class="field">
+      <label>한자 사용</label>
+      <div class="checks">
+        <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
+      </div>
+    </div>
+
+    <div class="field row">
+      <div>
+        <label>항렬자(돌림자) — 선택</label>
+        <input type="text" name="항렬자" placeholder="예) 賢" maxlength="1">
+      </div>
+      <div>
+        <label>항렬자 위치</label>
+        <select name="항렬위치">
+          <option value="뒤">두 번째 글자</option>
+          <option value="첫">첫 글자</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>원하는 느낌 (선택 — 여러 개 가능)</label>
+      <div class="chips" id="person-keywords"></div>
+    </div>
+
+    <button class="submit" type="submit">이름 받아오기</button>
+  </form>
+  <div class="out" id="out-person"></div>
+</section>
+
+<!-- 반려동물 -->
+<section class="tab-pane" data-tab="pet">
+  <form id="pet-form" class="form">
+    <h3>반려동물 작명</h3>
+    <p class="sub">품종·털색·성격까지 보고 컨셉 풀에서 추천합니다. 부르기 좋은 순으로 정렬돼요.</p>
+
+    <div class="field row">
+      <div>
+        <label>종류</label>
+        <select name="종류">
+          <option value="강아지">강아지</option>
+          <option value="고양이">고양이</option>
+        </select>
+      </div>
+      <div>
+        <label>성별</label>
+        <select name="성별">
+          <option value="u">선택 안 함</option>
+          <option value="m">수컷</option>
+          <option value="f">암컷</option>
+        </select>
+      </div>
+      <div>
+        <label>품종</label>
+        <input type="text" name="품종" placeholder="예) 말티즈, 코리안숏헤어">
+      </div>
+    </div>
+
+    <div class="field row">
+      <div>
+        <label>털색</label>
+        <select name="털색">
+          <option value="">선택 안 함</option>
+          <option>흰색</option><option>검정</option><option>갈색</option>
+          <option>회색</option><option>얼룩</option><option>삼색</option><option>치즈</option>
+        </select>
+      </div>
+      <div>
+        <label>이름 스타일</label>
+        <select name="스타일">
+          <option value="auto">자동(분위기에 맞춰)</option>
+          <option value="cute">귀여움</option>
+          <option value="cool">쿨함</option>
+          <option value="food_kor">한식 간식</option>
+          <option value="food_west">디저트·카페</option>
+          <option value="nature">자연·우주</option>
+          <option value="hero">히어로·캐릭터</option>
+          <option value="korean_old">한국식 옛이름</option>
+          <option value="retro90">90년대 추억</option>
+          <option value="funny">웃긴 작명</option>
+          <option value="english">영어식</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>성격 (여러 개)</label>
+      <div class="chips" id="pet-personalities"></div>
+    </div>
+
+    <div class="field">
+      <div class="checks">
+        <label><input type="checkbox" name="병원친화"> 동물병원에서 호명될 때 안 부끄러운 이름만</label>
+      </div>
+    </div>
+
+    <button class="submit" type="submit">이름 받아오기</button>
+  </form>
+  <div class="out" id="out-pet"></div>
+</section>
+
+<!-- 회사·팀 -->
+<section class="tab-pane" data-tab="company">
+  <form id="company-form" class="form">
+    <h3>회사·가게·팀 작명</h3>
+    <p class="sub">상황을 고르고 분위기를 알려주세요. 슬로건·도메인 후보·로고 모티프까지 함께 드려요.</p>
+
+    <div class="field row">
+      <div>
+        <label>상황</label>
+        <select name="상황" id="company-situation">
+          <option value="회사">회사·브랜드</option>
+          <option value="가게">가게·매장</option>
+          <option value="팀">팀(조별·이벤트)</option>
+          <option value="닉네임">닉네임·게임 아이디</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="company-nick-fields" style="display:none">
+      <div class="field">
+        <label>게임·플랫폼 이름 (자유 입력)</label>
+        <input type="text" name="게임명" id="game-name-input"
+               placeholder="예) 리그오브레전드, 원신, 던파, 발로란트, 철권8, 마인크래프트, 디스코드…"
+               list="game-presets" autocomplete="off">
+        <datalist id="game-presets">
+          <option value="리그오브레전드">
+          <option value="오버워치2">
+          <option value="발로란트">
+          <option value="배틀그라운드">
+          <option value="포트나이트">
+          <option value="에이펙스">
+          <option value="콜오브듀티">
+          <option value="서든어택">
+          <option value="피파온라인">
+          <option value="피파4">
+          <option value="메이플스토리">
+          <option value="던전앤파이터">
+          <option value="로스트아크">
+          <option value="리니지M">
+          <option value="원신">
+          <option value="붕괴스타레일">
+          <option value="명일방주">
+          <option value="검은사막">
+          <option value="블루아카이브">
+          <option value="우마무스메">
+          <option value="브롤스타즈">
+          <option value="쿠키런">
+          <option value="쿠키런킹덤">
+          <option value="애니팡">
+          <option value="캔디크러쉬">
+          <option value="하스스톤">
+          <option value="클래시로얄">
+          <option value="유희왕마스터듀얼">
+          <option value="디아블로4">
+          <option value="엘든링">
+          <option value="다크소울">
+          <option value="젤다의전설">
+          <option value="몬스터헌터">
+          <option value="스타크래프트">
+          <option value="카트라이더">
+          <option value="철권8">
+          <option value="스트리트파이터6">
+          <option value="NBA2K">
+          <option value="마인크래프트">
+          <option value="로블록스">
+          <option value="테라리아">
+          <option value="디제이맥스">
+          <option value="사운드볼텍스">
+          <option value="동물의숲">
+          <option value="심즈">
+          <option value="스타듀밸리">
+          <option value="윷놀이">
+          <option value="바둑">
+          <option value="장기">
+          <option value="체스">
+          <option value="고스톱">
+          <option value="디스코드">
+          <option value="스팀">
+        </datalist>
+        <small class="hint" id="game-match-hint">알려진 게임이면 자동으로 풀을 매칭하고, 모르는 게임이면 아래 장르를 사용합니다.</small>
+      </div>
+      <div class="field row">
+        <div>
+          <label>장르 (자동 매칭 실패 시 사용)</label>
+          <select name="장르">
+            <option value="auto">자동(게임명으로 추정)</option>
+            <option value="mmorpg">MMORPG (리니지·로아·던파·원신…)</option>
+            <option value="fps">FPS (오버워치·발로란트·서든…)</option>
+            <option value="br">배틀로얄 (배그·포트나이트·에이펙스…)</option>
+            <option value="moba">MOBA (롤·도타·히어로즈…)</option>
+            <option value="rpg">RPG (디아블로·엘든링·젤다…)</option>
+            <option value="mobile">모바일 캐주얼 (애니팡·쿠키런·캔디팡…)</option>
+            <option value="card">카드·전략 (하스·클래시로얄·유희왕…)</option>
+            <option value="fight">격투·스포츠 (철권·스파·NBA2K…)</option>
+            <option value="board">보드·전통 (바둑·장기·체스·고스톱…)</option>
+            <option value="sand">샌드박스 (마크·로블록스·테라리아…)</option>
+            <option value="rhythm">리듬·음악 (디맥·사볼·비사…)</option>
+            <option value="sim">시뮬·경영 (심즈·동숲·스타듀…)</option>
+            <option value="gen">범용 인터넷 (디코·스팀·SNS)</option>
+          </select>
+        </div>
+        <div>
+          <label>스타일</label>
+          <select name="닉스타일">
+            <option value="auto">자동(게임 분위기)</option>
+            <option value="short">짧게 (3~6자)</option>
+            <option value="long">길게</option>
+            <option value="serious">진지하게</option>
+            <option value="funny">웃기게</option>
+            <option value="eng">영문 위주</option>
+            <option value="kor">한글 위주</option>
+            <option value="creative">참신하게 (의외의 합성)</option>
+            <option value="popular">대중적으로 (실제 흔한 톤)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>꼭 들어갔으면 하는 단어 (선택, 쉼표 구분)</label>
+        <input type="text" name="닉키워드" placeholder="예) 별, 호빵, 87">
+      </div>
+    </div>
+
+    <div id="company-normal-fields">
+      <div class="field row">
+        <div>
+          <label>업종/분야</label>
+          <input type="text" name="업종" placeholder="예) 카페, IT, 의류, 베이커리">
+        </div>
+        <div>
+          <label>이름 스타일</label>
+          <select name="스타일">
+            <option value="auto">자동</option>
+            <option value="kor">한글 위주</option>
+            <option value="eng">영문 위주</option>
+            <option value="mix">한·영 혼합</option>
+            <option value="abbr">약자형</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>추구하는 이미지 (여러 개)</label>
+        <div class="chips" id="company-images"></div>
+      </div>
+
+      <div class="field">
+        <label>담고 싶은 핵심 키워드 — 쉼표·공백 구분</label>
+        <input type="text" name="핵심키워드" placeholder="예) 새벽, 빛, 정성">
+      </div>
+    </div>
+
+    <div id="company-team-fields" style="display:none">
+      <div class="field">
+        <label>팀 분위기</label>
+        <div class="checks">
+          <label><input type="radio" name="분위기" value="serious"> 진지하게</label>
+          <label><input type="radio" name="분위기" value="mid" checked> 적당히 웃기게</label>
+          <label><input type="radio" name="분위기" value="fun"> 대놓고 웃기게</label>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit" type="submit">이름 받아오기</button>
+  </form>
+  <div class="out" id="out-company"></div>
+</section>
+
+<section class="faq">
+  <h3>이용 안내</h3>
+  <details><summary>작명 결과는 어떻게 계산되나요?</summary>
+    <p>인물 탭은 양력 생년월일과 시간을 받아 60갑자(천간·지지)로 사주를 환산하고, 천간·지지 각각의 오행을 세어 비중이 가장 적은 오행을 "보충해야 할 기운"으로 잡습니다. 그 오행에 해당하는 한자에 가중치를 주고, 키워드와 성별 매칭을 추가로 더해 후보를 만듭니다. 발음은 한글 자모를 분리해 자음 충돌·받침·모음 종결을 보고 점수화합니다.</p>
+  </details>
+  <details><summary>사주를 모르면 어떻게 되나요?</summary>
+    <p>생년월일을 비우면 사주 가중치 없이 키워드·성별·시대성 점수만으로 후보를 뽑아요. 한자 미사용으로 두면 순한글·인기 음절 풀에서 추천합니다.</p>
+  </details>
+  <details><summary>이 결과로 바로 신고/등록해도 되나요?</summary>
+    <p>이름은 한 번 정하면 오래 부르는 일이라 추천 결과를 그대로 쓰기보다, 마음에 드는 글자 조합을 골라 직접 다듬어 보시는 걸 권합니다. 회사·가게명은 상표 등록 전에 특허청 키프리스(KIPRIS)에서 동일/유사 상호를 꼭 확인하세요.</p>
+  </details>
+  <details><summary>한자 데이터는 어디 기준인가요?</summary>
+    <p>대법원 고시 인명용 한자 중 실제 작명에 많이 쓰이는 글자를 추렸고, 획수는 강희자전 기준입니다. 자원오행은 부수·의미를 따랐고, 학파마다 해석이 다를 수 있어 참고용으로 봐주세요.</p>
+  </details>
+  <details><summary>한자가 같은데 음이 다르게 나와요</summary>
+    <p>한 글자가 두음법칙·관습으로 음이 갈리는 경우(예: 柳 류/유, 良 량/양)는 가장 흔한 표기를 우선 노출합니다.</p>
+  </details>
+</section>
+
+<footer>
+  <p class="signature">— 좋은 이름 한 자 받으셨길 —</p>
+  <p>© 작명연구소 · 결과는 참고용입니다.</p>
+</footer>
+
+</main>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

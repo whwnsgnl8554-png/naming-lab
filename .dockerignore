@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+.dockerignore
+.gcloudignore
+.vscode
+.idea
+.wrangler
+node_modules
+README.md
+*.log
+*.md
+.DS_Store
+Thumbs.db

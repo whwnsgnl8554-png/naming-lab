@@ -1,0 +1,76 @@
+# 작명연구소 — Caddy 설정
+# Cloud Run 친화: PORT 환경변수에 바인딩, 보안 헤더, 캐시 정책, 압축.
+
+{
+	# 글로벌 옵션
+	auto_https off                       # Cloud Run이 TLS를 대신 처리 — Caddy는 평문 HTTP로 응답
+	servers {
+		trusted_proxies static private_ranges  # Cloud Run/구글 사설망 IP만 X-Forwarded-* 신뢰
+	}
+	admin off                            # 관리 API 비활성화 (보안)
+	persist_config off                   # 디스크 쓰기 최소화
+}
+
+:{$PORT:8080} {
+	root * /srv
+
+	# ── 압축 ────────────────────────────────
+	encode zstd gzip
+
+	# ── 보안 헤더 (모든 응답) ────────────────
+	header {
+		# HTTPS 강제 — Cloud Run의 LB가 항상 TLS를 종단
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+		# 클릭재킹 방지 — 모든 iframe 임베드 차단
+		X-Frame-Options "DENY"
+
+		# MIME 스니핑 방지
+		X-Content-Type-Options "nosniff"
+
+		# 외부 리퍼러 최소화
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# 브라우저 권한 모두 차단 (이 사이트는 카메라·마이크·위치 등 안 씀)
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+
+		# CSP — Google Fonts 만 허용. 인라인 스타일은 index.html 본문에 직접 박혀 있어 unsafe-inline 필요
+		Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+
+		# CORP — 다른 오리진이 이 리소스를 마음대로 임베드 못 하도록
+		Cross-Origin-Resource-Policy "same-origin"
+		Cross-Origin-Opener-Policy "same-origin"
+
+		# 서버 정보 노출 최소화
+		-Server
+		-X-Powered-By
+	}
+
+	# ── 캐시 정책 ────────────────────────────
+	# JS / CSS / 폰트 / 이미지 — 1년 immutable. 파일명에 해시가 없어도 변경 시 강제 새로고침은
+	# Service Worker 없이 사용자 측 캐시 새로고침에 의존하므로, 운영 후 자산 변경 시 파일명 끝에
+	# ?v=YYYYMMDD 같은 쿼리 첨가를 권장.
+	@assets path *.css *.js *.svg *.png *.jpg *.jpeg *.woff *.woff2 *.ico
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	# HTML — 캐시 안 함 (배포 후 즉시 반영)
+	@html {
+		path *.html /
+	}
+	header @html Cache-Control "no-cache, must-revalidate"
+
+	# ── 라우팅 ──────────────────────────────
+	# 정적 파일 서빙. 알 수 없는 경로는 자연스럽게 404 (보안상 더 명확).
+	# 민감 파일은 hide로 직접 접근 차단.
+	file_server {
+		index index.html
+		hide .git* Dockerfile Caddyfile *.md .dockerignore .gcloudignore
+	}
+
+	# ── 로그 ────────────────────────────────
+	log {
+		output stdout                      # Cloud Run이 stdout/stderr를 자동 수집
+		format json
+		level INFO
+	}
+}
