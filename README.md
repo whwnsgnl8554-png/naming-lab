@@ -126,7 +126,7 @@ gcloud run deploy naming-lab \
   --min-instances=0 \
   --max-instances=3 \
   --cpu=1 \
-  --memory=256Mi \
+  --memory=512Mi \
   --port=8080 \
   --concurrency=80 \
   --execution-environment=gen2
