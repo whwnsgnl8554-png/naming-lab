@@ -40,7 +40,6 @@ jobs:
             --source=. \
             --project="$PROJECT_ID" \
             --region="$REGION" \
-            --platform=managed \
             --allow-unauthenticated \
             --port=8080 \
             --cpu=1 \
@@ -50,7 +49,6 @@ jobs:
             --min-instances=0 \
             --max-instances=3 \
             --execution-environment=gen2 \
-            --no-cpu-throttling=false \
             --ingress=all \
             --quiet
 
