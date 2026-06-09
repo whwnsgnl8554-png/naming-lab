@@ -1,0 +1,64 @@
+name: Deploy API to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-northeast3
+  SERVICE: naming-lab-api
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}     # 선택 — 비어 있으면 디폴트 origin만 허용
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy API
+        working-directory: server
+        run: |
+          ORIGINS="${FRONTEND_URL:-https://naming-lab-360236514121.asia-northeast3.run.app},http://localhost:8775"
+          gcloud run deploy "$SERVICE" \
+            --source=. \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --allow-unauthenticated \
+            --port=8080 \
+            --cpu=1 \
+            --memory=512Mi \
+            --concurrency=20 \
+            --timeout=60s \
+            --min-instances=0 \
+            --max-instances=2 \
+            --execution-environment=gen2 \
+            --set-env-vars="ALLOWED_ORIGINS=${ORIGINS}" \
+            --set-secrets="GEMINI_API_KEY=gemini-api-key:latest" \
+            --quiet
+
+      - name: Show URL
+        run: |
+          URL=$(gcloud run services describe "$SERVICE" \
+                  --region="$REGION" \
+                  --project="$PROJECT_ID" \
+                  --format='value(status.url)')
+          echo "🤖 API Deployed: $URL"

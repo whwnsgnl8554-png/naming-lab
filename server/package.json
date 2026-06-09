@@ -1,0 +1,16 @@
+{
+  "name": "naming-lab-api",
+  "version": "1.0.0",
+  "description": "작명연구소 AI 추천 백엔드 — Gemini API 연동",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}

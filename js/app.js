@@ -5,6 +5,13 @@ import { 반려동물작명 } from './naming/pet.js';
 import { 회사작명 } from './naming/company.js';
 import { 닉네임작명 } from './naming/nickname.js';
 import { GAME_ALIASES } from './data/nickname.js';
+import { mountExtraButton } from './ai.js';
+
+// 마지막 폼 입력값 저장 — AI 추천 호출 시 재사용
+let lastPersonInput = null;
+let lastPetInput = null;
+let lastCompanyInput = null;
+let lastNickInput = null;
 
 const 카테고리라벨 = {
   sc: '스타크래프트', pubg: '배틀그라운드', fifa: '피파온라인',
@@ -151,6 +158,7 @@ function initPersonForm() {
       input.항렬자 = 항렬[0];
       input.항렬위치 = fd.get('항렬위치') || '뒤';
     }
+    lastPersonInput = input;
     renderLoading('out-person', '먹을 갈고 종이를 펴는 중…');
     setTimeout(() => {
       const result = 인물작명(input);
@@ -200,6 +208,25 @@ function renderPersonResult(result) {
 
   el.innerHTML = html;
   $('#person-redo')?.addEventListener('click', () => $('#person-form')?.requestSubmit());
+
+  // AI 추천 더 받기
+  mountExtraButton(el, {
+    type: 'person',
+    input: () => lastPersonInput || {},
+    getExisting: () => [...el.querySelectorAll('.name-card .kor')].map(n => n.textContent.replace(/^[^가-힣]+/, '')),
+    renderExtra: (names) => `<div class="cards">${
+      names.map(n => `
+        <article class="name-card ai-card">
+          <header class="nc-head">
+            <h4 class="nc-han">${n.한자 ? `<span class="hanja">${n.한자}</span>` : ''}<span class="kor">${n.한글 || n.이름 || ''}</span></h4>
+            <span class="nc-score ai-tag">AI</span>
+          </header>
+          ${n.뜻 ? `<p class="nc-meaning">${n.뜻}</p>` : ''}
+          ${n.코멘트 ? `<p class="nc-first">${n.코멘트}</p>` : ''}
+        </article>
+      `).join('')
+    }</div>`,
+  });
 }
 
 function renderPersonCard(c) {
@@ -247,6 +274,7 @@ function initPetForm() {
       병원친화: fd.get('병원친화') === 'on',
       개수: 8,
     };
+    lastPetInput = input;
     renderLoading('out-pet', '강아지/고양이 분위기를 살피는 중…');
     setTimeout(() => renderPetResult(반려동물작명(input)), 380);
   });
@@ -275,6 +303,21 @@ function renderPetResult(r) {
   el.dataset.populated = '1';
   el.innerHTML = html;
   $('#pet-redo')?.addEventListener('click', () => $('#pet-form')?.requestSubmit());
+
+  mountExtraButton(el, {
+    type: 'pet',
+    input: () => lastPetInput || {},
+    getExisting: () => [...el.querySelectorAll('.pet-card h4')].map(n => (n.textContent || '').split('·')[0].trim()),
+    renderExtra: (names) => `<div class="cards pet-cards">${
+      names.map(n => `
+        <article class="pet-card ai-card">
+          <header><h4>${n.이름 || ''}</h4><span class="badge ai-tag">AI</span></header>
+          ${n.유래 ? `<p class="pet-yulae">${n.유래}</p>` : ''}
+          ${n.코멘트 ? `<p class="pet-yulae">${n.코멘트}</p>` : ''}
+        </article>
+      `).join('')
+    }</div>`,
+  });
 }
 
 // ─── 회사·팀 폼 ─────────────────────
@@ -336,6 +379,7 @@ function initCompanyForm() {
         핵심키워드: (fd.get('닉키워드') || '').toString().split(/[ ,]+/).filter(Boolean),
         개수: 12,
       };
+      lastNickInput = input;
       renderLoading('out-company', '닉네임 한 줄씩 손글씨로 적어보는 중…');
       setTimeout(() => renderNickResult(닉네임작명(input)), 380);
       return;
@@ -350,6 +394,7 @@ function initCompanyForm() {
       분위기: fd.get('분위기') || 'mid',
       개수: 상황 === '팀' ? 12 : 8,
     };
+    lastCompanyInput = input;
     renderLoading('out-company', '간판 위에 글자를 올려보는 중…');
     setTimeout(() => renderCompanyResult(회사작명(input)), 380);
   });
@@ -386,6 +431,20 @@ function renderNickResult(r) {
   el.dataset.populated = '1';
   el.innerHTML = html;
   $('#nick-redo')?.addEventListener('click', () => $('#company-form')?.requestSubmit());
+
+  mountExtraButton(el, {
+    type: 'nickname',
+    input: () => lastNickInput || {},
+    getExisting: () => [...el.querySelectorAll('.comp-card h4')].map(n => (n.textContent || '').trim()),
+    renderExtra: (names) => `<div class="cards comp-cards">${
+      names.map(n => `
+        <article class="comp-card ai-card">
+          <header><h4>${n.이름 || ''}</h4><span class="badge ai-tag">AI</span></header>
+          ${n.코멘트 ? `<p class="slogan">${n.코멘트}</p>` : ''}
+        </article>
+      `).join('')
+    }</div>`,
+  });
 }
 
 function renderCompanyResult(r) {
@@ -408,6 +467,21 @@ function renderCompanyResult(r) {
   el.dataset.populated = '1';
   el.innerHTML = html;
   $('#comp-redo')?.addEventListener('click', () => $('#company-form')?.requestSubmit());
+
+  mountExtraButton(el, {
+    type: 'company',
+    input: () => lastCompanyInput || {},
+    getExisting: () => [...el.querySelectorAll('.comp-card h4')].map(n => (n.textContent || '').trim()),
+    renderExtra: (names) => `<div class="cards comp-cards">${
+      names.map(n => `
+        <article class="comp-card ai-card">
+          <header><h4>${n.이름 || ''}</h4><span class="badge ai-tag">AI</span></header>
+          ${n.슬로건 ? `<p class="slogan">"${n.슬로건}"</p>` : ''}
+          ${n.코멘트 ? `<p class="motif">${n.코멘트}</p>` : ''}
+        </article>
+      `).join('')
+    }</div>`,
+  });
 }
 
 // ─── init ────────────────────────────

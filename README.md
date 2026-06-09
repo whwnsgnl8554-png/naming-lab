@@ -232,6 +232,90 @@ docker run --rm -p 8080:8080 -e PORT=8080 naming-lab
 
 Cloud Run 안 쓰고 GitHub Pages·Netlify·Cloudflare Pages 어디든 폴더째 올라가는 순수 정적 사이트입니다. `Dockerfile`·`Caddyfile`은 무시되고 정적 자산만 서빙됩니다.
 
+---
+
+## 🤖 AI 추천 (Gemini) 백엔드 — 선택
+
+기본 작명은 규칙 + 5,034개 큐레이팅 풀로 동작하지만, 결과 페이지의 **"AI 추천 더 받기"** 버튼을 누르면 Gemini가 즉석에서 추가 후보를 생성해 카드로 추가합니다.
+
+### 무료 한도
+Gemini 1.5 Flash 무료 한도: **분당 15회, 일 1,500회**. 작명 사이트로 이 한도 다 못 씁니다.
+
+### 1) API 키 발급
+🔗 https://aistudio.google.com/apikey 접속 → **Get API key** → **Create API key** → 키 복사
+
+### 2) Secret Manager에 키 저장 (안전)
+Cloud Shell에서:
+
+```bash
+PROJECT_ID="naming-lab"
+gcloud services enable secretmanager.googleapis.com --project=$PROJECT_ID
+
+# 키를 시크릿으로 저장 (값은 프롬프트에서 입력)
+echo -n "여기에_복사한_GEMINI_API_KEY_붙여넣기" | \
+  gcloud secrets create gemini-api-key --data-file=- --project=$PROJECT_ID
+
+# 백엔드 SA가 시크릿 읽도록 권한 부여
+SA="naming-lab-deployer@${PROJECT_ID}.iam.gserviceaccount.com"
+gcloud secrets add-iam-policy-binding gemini-api-key \
+  --member="serviceAccount:$SA" --role=roles/secretmanager.secretAccessor \
+  --project=$PROJECT_ID
+```
+
+### 3) 백엔드 Cloud Run 서비스 배포
+
+```bash
+cd ~/naming-lab/server   # Cloud Shell에서 clone한 위치 기준
+
+# 프론트 URL을 ALLOWED_ORIGINS에 넣고 배포
+FRONTEND_URL="https://naming-lab-360236514121.asia-northeast3.run.app"
+
+gcloud run deploy naming-lab-api \
+  --source=. \
+  --region=asia-northeast3 \
+  --allow-unauthenticated \
+  --port=8080 \
+  --cpu=1 \
+  --memory=512Mi \
+  --concurrency=20 \
+  --timeout=60s \
+  --min-instances=0 \
+  --max-instances=2 \
+  --execution-environment=gen2 \
+  --set-env-vars="ALLOWED_ORIGINS=${FRONTEND_URL},http://localhost:8775" \
+  --set-secrets="GEMINI_API_KEY=gemini-api-key:latest"
+```
+
+배포 끝나면 출력에서 `Service URL: https://naming-lab-api-xxxxxx-an.a.run.app` 복사.
+
+### 4) 프론트에 API URL 주입
+`index.html`의 아래 줄에서 URL을 본인 백엔드 URL로 교체:
+
+```html
+<script>
+  window.NAMING_LAB_API_URL = 'https://naming-lab-api-xxxxxx.asia-northeast3.run.app';
+</script>
+```
+
+그리고 push:
+```bash
+git add index.html && git commit -m "feat: AI 백엔드 URL 연결" && git push
+```
+
+→ 1분 뒤 사이트에 **"AI 추천 더 받기"** 버튼이 활성화됩니다.
+
+### 5) 동작 확인
+- 결과 페이지에서 버튼 클릭 → 2~3초 후 "AI가 더 받아온 이름들" 카드 추가
+- 에러 메시지가 빨간 줄로 뜨면 → Cloud Run 로그 확인:
+  ```bash
+  gcloud run services logs read naming-lab-api --region=asia-northeast3 --limit=20
+  ```
+
+### 보안
+- **API 키는 절대 프론트 코드에 넣지 마세요** — Secret Manager에서 백엔드 컨테이너로만 주입됨
+- **CORS**: `ALLOWED_ORIGINS` 환경변수의 도메인만 호출 가능. 다른 사이트가 백엔드 무단 호출 불가
+- **Rate limiting**: 트래픽 폭주 시 Gemini 자체 한도 + Cloud Run `max-instances=2`로 자연 cap. 더 엄격한 제한 원하면 별도 미들웨어 추가 가능
+
 ## 면책
 
 이름은 한 번 정하면 오래 부르는 일이라, 추천 결과를 그대로 쓰기보다 마음에 드는 글자 조합을 골라 직접 다듬어 보시는 걸 권합니다. 회사·상호명은 등록 전 KIPRIS 동일·유사 상표 검색 필수.
