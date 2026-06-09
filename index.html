@@ -475,6 +475,11 @@ small.hint.warn { color: var(--gold); }
   padding-top: 28px;
   border-top: 1px dashed var(--card-border);
 }
+.taemyung-block.taemyung-solo {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
 .tm-head { margin-bottom: 18px; }
 .tm-h {
   display: flex;
@@ -894,10 +899,11 @@ footer .signature {
       <div class="checks">
         <label><input type="radio" name="구분" value="신생아" checked> 신생아(예정)</label>
         <label><input type="radio" name="구분" value="개명"> 개명(이미 태어남)</label>
+        <label><input type="radio" name="구분" value="태명만"> 태명만 짓기</label>
       </div>
     </div>
 
-    <div class="field row">
+    <div class="field row person-bonmyung-field">
       <div>
         <label>성(姓)</label>
         <input type="text" name="성" placeholder="예) 김">
@@ -939,14 +945,14 @@ footer .signature {
     </div>
     <small class="hint" id="person-date-hint">예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.</small>
 
-    <div class="field">
+    <div class="field person-bonmyung-field">
       <label>한자 사용</label>
       <div class="checks">
         <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
       </div>
     </div>
 
-    <div class="field row">
+    <div class="field row person-bonmyung-field">
       <div>
         <label>항렬자(돌림자) — 선택</label>
         <input type="text" name="항렬자" placeholder="예) 賢" maxlength="1">

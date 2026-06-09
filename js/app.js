@@ -123,15 +123,33 @@ function initPersonForm() {
   const 안내 = $('#person-date-hint');
   const sub = $('#person-sub');
   const 태명필드 = $('#person-taemyung-fields');
+  const 본명필드들 = $$('.person-bonmyung-field');
+  // 태명만 모드 — 본명 함께 받기 체크박스는 의미 없으니 숨김
+  const 태명함께체크 = form.querySelector('input[name="태명함께"]')?.closest('label');
+
   function 구분동기화() {
     const v = (form.querySelector('input[name="구분"]:checked') || {}).value || '신생아';
-    for (const l of 라벨들) l.textContent = l.dataset[v];
-    // 태명은 신생아일 때만 의미 있음
-    if (태명필드) 태명필드.style.display = v === '신생아' ? '' : 'none';
+    // 신생아 ↔ 개명 라벨 토글 (태명만은 신생아와 동일 라벨)
+    const labelKey = v === '태명만' ? '신생아' : v;
+    for (const l of 라벨들) l.textContent = l.dataset[labelKey];
+
+    // 본명 전용 필드(성·항렬자·한자·음절)는 태명만 모드에서 숨김
+    for (const f of 본명필드들) f.style.display = v === '태명만' ? 'none' : '';
+
+    // 태명 옵션 — 신생아/태명만 모드에서만
+    if (태명필드) 태명필드.style.display = (v === '신생아' || v === '태명만') ? '' : 'none';
+
+    // "본명과 함께 태명도 받기" 체크박스 — 태명만 모드에선 숨김 (중복)
+    if (태명함께체크) 태명함께체크.style.display = v === '태명만' ? 'none' : '';
+
     if (v === '신생아') {
       안내.textContent = '예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.';
       안내.className = 'hint warn';
       sub.innerHTML = '<b>출산 예정일</b>로 입력해 주세요. 예정일 기준으로 사주를 추정해, 부족한 오행을 채울 글자 위주로 추천합니다. 본명과 함께 태명도 같이 받을 수 있어요.';
+    } else if (v === '태명만') {
+      안내.textContent = '본명은 작명소·할아버지·작명일에 따로 맡길 예정이거나, 이미 본명이 정해져 있을 때 추천합니다. 예정 월만 알려주시면 계절을 반영해 6개 태명을 골라요.';
+      안내.className = 'hint ok';
+      sub.innerHTML = '<b>태명만</b> 따로 짓는 모드예요. 9개월 동안 부르기 좋은 한 두 음절의 친근한 호칭을 골라드립니다. 예정 월·키워드·형제자매 여부만으로 충분해요.';
     } else {
       안내.textContent = '실제 생년월일을 그대로 입력해 주세요. 출생 시간을 알면 사주가 더 정확해져요.';
       안내.className = 'hint ok';
@@ -162,27 +180,36 @@ function initPersonForm() {
       input.항렬자 = 항렬[0];
       input.항렬위치 = fd.get('항렬위치') || '뒤';
     }
-    // 태명 옵션 (신생아일 때만 의미 있음)
-    if (input.구분 === '신생아') {
-      input.태명함께 = fd.get('태명함께') === 'on';
+    // 태명 옵션 (신생아·태명만 모드에서 의미 있음)
+    if (input.구분 === '신생아' || input.구분 === '태명만') {
+      input.태명함께 = input.구분 === '태명만' ? true : (fd.get('태명함께') === 'on');
       input.형제자매 = fd.get('형제자매') === 'on';
       input.윗아이 = (fd.get('윗아이') || '').toString().trim();
     }
 
     lastPersonInput = input;
-    renderLoading('out-person', '먹을 갈고 종이를 펴는 중…');
+    renderLoading('out-person', input.구분 === '태명만'
+      ? '9개월 동안 부를 한두 음절을 고르는 중…'
+      : '먹을 갈고 종이를 펴는 중…');
     setTimeout(() => {
-      const result = 인물작명(input);
-      // 신생아 + 태명 함께 선택이면 태명도 같이 생성
-      if (input.구분 === '신생아' && input.태명함께) {
+      let result;
+      if (input.구분 === '태명만') {
+        // 본명 생성 스킵 — 태명만
+        result = { 후보들: [], 사주: null };
+      } else {
+        result = 인물작명(input);
+      }
+      // 신생아 + 태명 함께 선택이거나 태명만 모드면 태명 생성
+      if ((input.구분 === '신생아' && input.태명함께) || input.구분 === '태명만') {
         result.태명 = 태명작명({
           예정월: input.생월,
           키워드: input.키워드,
           형제자매: input.형제자매,
           윗아이: input.윗아이,
-          개수: 6,
+          개수: input.구분 === '태명만' ? 10 : 6,   // 태명만 모드는 더 많이
         });
       }
+      result._구분 = input.구분;
       renderPersonResult(result, input);
     }, 380);
   });
@@ -197,10 +224,13 @@ function renderLoading(outId, msg) {
 function renderPersonResult(result, input) {
   const el = $('#out-person');
   const 사주 = result.사주;
+  const 태명만모드 = result._구분 === '태명만';
   let html = `<section class="result-block">`;
-  html += `<h3 class="result-h">받아 든 이름들</h3>`;
+  if (!태명만모드) {
+    html += `<h3 class="result-h">받아 든 이름들</h3>`;
+  }
 
-  if (사주) {
+  if (사주 && !태명만모드) {
     html += `<div class="saju-card">`;
     html += `<div class="saju-row"><span class="lbl">사주</span><span>${[사주.연주, 사주.월주, 사주.일주, 사주.시주].filter(Boolean).map(p => `<b>${p.천.자}${p.지.자}</b>`).join(' · ')}</span></div>`;
     if (result.띠) {
@@ -218,21 +248,28 @@ function renderPersonResult(result, input) {
     html += `</div>`;
   }
 
-  html += `<div class="cards">`;
-  for (const c of result.후보들) {
-    html += renderPersonCard(c);
+  if (!태명만모드) {
+    html += `<div class="cards">`;
+    for (const c of result.후보들) {
+      html += renderPersonCard(c);
+    }
+    html += `</div>`;
   }
-  html += `</div>`;
 
-  // 태명 섹션 (신생아 + 태명함께 체크 시)
+  // 태명 섹션 (신생아 + 태명함께 체크, 또는 태명만 모드)
   if (result.태명 && result.태명.후보들?.length) {
     const t = result.태명;
-    html += `<section class="taemyung-block">
+    const 헤더 = 태명만모드
+      ? '받아 든 태명'
+      : '태명 — 9개월 동안 부를 이름';
+    html += `<section class="taemyung-block${태명만모드 ? ' taemyung-solo' : ''}">
       <header class="tm-head">
-        <h3 class="result-h tm-h">태명 — 9개월 동안 부를 이름</h3>
+        <h3 class="result-h tm-h">${헤더}</h3>
         <p class="result-sub">
           ${t.계절 ? `<b>${t.계절}</b>에 만날 아기에게 어울리는 톤으로 골랐어요. ` : ''}
-          본명과 다르게 사주·한자보단 부르기 좋고 따뜻한 느낌을 우선했어요.
+          ${태명만모드
+            ? '사주·한자는 빼고 부르기 좋음·따뜻함·계절감만 보고 추렸어요.'
+            : '본명과 다르게 사주·한자보단 부르기 좋고 따뜻한 느낌을 우선했어요.'}
           ${t.형제자매 ? '윗아이 이름과 운율이 맞는 것도 한두 개 섞였어요.' : ''}
         </p>
       </header>
@@ -249,7 +286,8 @@ function renderPersonResult(result, input) {
   el.innerHTML = html;
   $('#person-redo')?.addEventListener('click', () => $('#person-form')?.requestSubmit());
 
-  // AI 추천 더 받기
+  // AI 추천 더 받기 — 본명 추천이 있는 모드에서만
+  if (태명만모드) return;
   mountExtraButton(el, {
     type: 'person',
     input: () => lastPersonInput || {},
