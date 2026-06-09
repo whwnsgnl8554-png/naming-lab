@@ -14,6 +14,7 @@ import { 자모분리 } from '../util/hangul.js';
 import { 인물종합점수, 발음점수, 시대성점수, 희소성점수 } from '../util/score.js';
 import { PERSON_KEYWORDS } from '../data/keywords.js';
 import { 보강가중 } from '../data/unse-hanja.js';
+import { 뜻에서한자훈 } from '../data/foreign.js';
 import { SYLLABLES, POPULAR_PERSON_NAMES } from '../data/syllables.js';
 
 // 성씨(한 글자) 모집단
@@ -44,6 +45,18 @@ function 한자가중치(h, ctx) {
   }
   // 운세 보강 — 사용자가 보강하고 싶은 운세에 해당하는 한자 +12씩
   w += 보강가중(ctx.보강운세, h);
+
+  // 외국인 모드 — 본명 음·뜻 가산
+  if (ctx.외국인모드) {
+    // 음역: 본명 한국 음의 글자(들)와 한자 음 일치 시 가산
+    if (ctx.음역음 && ctx.음역음.includes(h.음)) {
+      w += ctx.변환방식 === 'phonetic' ? 22 : 14;
+    }
+    // 의역: 본명 뜻 키워드가 한자 훈에 포함되면 가산
+    if (ctx.의미훈 && ctx.의미훈.some(t => h.훈.includes(t))) {
+      w += ctx.변환방식 === 'meaning' ? 22 : 14;
+    }
+  }
   return w;
 }
 
@@ -98,6 +111,13 @@ export function 인물작명(input) {
     아빠글자 = '',
     엄마글자 = '',
     합성어순 = '아빠먼저',
+    옛스러움제외 = true,
+    // ── 외국인 귀화 모드 ──
+    외국인모드 = false,
+    본명원어 = '',          // 예: "Sophia", "Yuki", "王雷"
+    본명한국음 = '',        // 사용자가 직접 한국식 음 표기 (예: "소피아", "유키", "왕뢰")
+    본명뜻 = '',            // 자유 텍스트 (예: "지혜로운 봄꽃", "thunder strong")
+    변환방식 = 'mix',        // 'phonetic' (음역) | 'meaning' (의역) | 'mix'
   } = input;
 
   // 사주 분석
@@ -132,8 +152,17 @@ export function 인물작명(input) {
     return 한글작명({ 성, 성별, 음절, 키워드, 부족오행, 띠정보, 사주 });
   }
 
+  // 외국인 모드 컨텍스트
+  const 음역음 = 외국인모드 ? [...(본명한국음 || '')].filter(c => /[가-힣]/.test(c)) : null;
+  const 의미훈 = 외국인모드 ? 뜻에서한자훈(본명뜻, 본명원어) : null;
+
   // 한자 후보 가중치 산정
-  const ctx = { 부족오행, 충만오행, 성별, 키워드들: 키워드, 보강운세: input.보강운세 || [] };
+  const ctx = {
+    부족오행, 충만오행, 성별,
+    키워드들: 키워드,
+    보강운세: input.보강운세 || [],
+    외국인모드, 음역음, 의미훈, 변환방식,
+  };
   const 가중리스트 = HANJA.map(h => ({ h, w: 한자가중치(h, ctx) }));
   가중리스트.sort((a, b) => b.w - a.w);
 
@@ -162,7 +191,10 @@ export function 인물작명(input) {
         if (c.첫.음 === c.둘.음) continue;       // 같은 음 두 번도 금지 (민민 등)
         const 한글 = c.첫.음 + c.둘.음;
         if (이미존재(후보들, 한글)) continue;
-        후보들.push(이름카드만들기({ 첫: c.첫, 둘: c.둘, 성, 한글, 사주, 띠정보, 키워드 }));
+        const 카드 = 이름카드만들기({ 첫: c.첫, 둘: c.둘, 성, 한글, 사주, 띠정보, 키워드 });
+        // 옛스러움 필터 — 시대성 점수 50 미만 제외
+        if (옛스러움제외 && 카드.시대성 < 50) continue;
+        후보들.push(카드);
         if (후보들.length >= 5) break;
       }
     }
@@ -176,6 +208,7 @@ export function 인물작명(input) {
     띠: 띠정보,
     운세,
     후보들,
+    외국인: 외국인모드 ? { 본명원어, 본명한국음, 본명뜻, 변환방식, 매칭훈: 의미훈 } : null,
   };
 }
 

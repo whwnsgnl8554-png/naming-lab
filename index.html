@@ -461,6 +461,29 @@ small.hint.warn { color: var(--gold); }
 .tm-boost-go { color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, var(--paper-3)); border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); }
 .tm-boost-go:hover { background: var(--gold); color: #fbf5e3; }
 
+/* ─── 외국인 본명 카드 ─── */
+.foreign-card {
+  background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--teal) 6%, transparent), transparent 50%), var(--paper-2);
+  border: 1px solid var(--line); border-left: 3px solid var(--teal);
+  border-radius: 0 var(--r-3) var(--r-3) 0;
+  padding: var(--s-3) var(--s-5);
+  margin-bottom: var(--s-4);
+}
+.fc-row {
+  display: flex; align-items: center; gap: var(--s-3);
+  margin: var(--s-2) 0; font-size: 13.5px;
+}
+.fc-row .lbl {
+  min-width: 90px; color: var(--ink-3); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600;
+}
+.fc-row b { color: var(--teal); font-family: var(--f-serif); font-weight: 700; font-size: 16px; letter-spacing: 0.02em; }
+.fc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.fc-tags span {
+  background: var(--paper-3); border: 1px solid var(--line); color: var(--ink-2);
+  padding: 1px 8px; border-radius: var(--r-full); font-size: 11.5px;
+}
+
 /* ─── 인쇄 (PDF) ─── */
 @media print {
   body {
@@ -670,9 +693,10 @@ small.hint.warn { color: var(--gold); }
     <small class="hint" id="person-date-hint">예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.</small>
 
     <div class="field person-bonmyung-field">
-      <label>한자 사용</label>
+      <label>이름 옵션</label>
       <div class="checks">
         <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
+        <label><input type="checkbox" name="옛스러움제외" checked> 옛스러운 이름 제외 (현대 트렌드 우선)</label>
       </div>
     </div>
 
@@ -717,6 +741,39 @@ small.hint.warn { color: var(--gold); }
           <option value="아빠먼저">아빠 + 엄마</option>
           <option value="엄마먼저">엄마 + 아빠</option>
         </select>
+      </div>
+    </div>
+
+    <!-- 외국인 귀화 모드 -->
+    <div class="field person-bonmyung-field">
+      <label>외국인 귀화·국제결혼</label>
+      <div class="checks">
+        <label><input type="checkbox" name="외국인모드"> 본명(영문·한자·일본어 등)으로 한국 이름 짓기</label>
+      </div>
+    </div>
+    <div class="field person-bonmyung-field" id="foreign-fields" style="display:none">
+      <div class="row">
+        <div>
+          <label>본명 (원어 표기)</label>
+          <input type="text" name="본명원어" placeholder="예) Sophia, 王雷, ゆうき, María">
+        </div>
+        <div>
+          <label>한국식 음 표기</label>
+          <input type="text" name="본명한국음" placeholder="예) 소피아, 왕뢰, 유키, 마리아">
+        </div>
+      </div>
+      <div class="field" style="margin-top: 12px;">
+        <label>본명 뜻 (자유 입력 — 한국어/영어 다 가능)</label>
+        <input type="text" name="본명뜻" placeholder="예) 지혜 / wisdom / 천둥 강한 / 봄꽃">
+        <small class="hint">사용자가 입력한 뜻에서 키워드를 뽑아 비슷한 의미의 한자를 우선 추천합니다. Sophia·Sakura·Yuki 같은 흔한 이름은 자동으로 뜻이 가산돼요.</small>
+      </div>
+      <div class="field">
+        <label>변환 방식</label>
+        <div class="checks">
+          <label><input type="radio" name="변환방식" value="mix" checked> 음·뜻 함께 (권장)</label>
+          <label><input type="radio" name="변환방식" value="phonetic"> 음역 위주 (소리)</label>
+          <label><input type="radio" name="변환방식" value="meaning"> 의역 위주 (뜻)</label>
+        </div>
       </div>
     </div>
 

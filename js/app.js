@@ -170,6 +170,15 @@ function initPersonForm() {
     });
   }
 
+  // 외국인 모드 체크 → 본명 필드 토글
+  const 외국인체크 = form.querySelector('input[name="외국인모드"]');
+  const 외국인필드 = $('#foreign-fields');
+  if (외국인체크 && 외국인필드) {
+    외국인체크.addEventListener('change', () => {
+      외국인필드.style.display = 외국인체크.checked ? '' : 'none';
+    });
+  }
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     const fd = new FormData(form);
@@ -178,6 +187,7 @@ function initPersonForm() {
       성: fd.get('성') || '',
       성별: fd.get('성별'),
       한자사용: fd.get('한자사용') === 'on',
+      옛스러움제외: fd.get('옛스러움제외') === 'on',
       음절: Number(fd.get('음절')),
       키워드: selectedChips('person-keywords'),
     };
@@ -204,6 +214,13 @@ function initPersonForm() {
       input.아빠글자 = (fd.get('아빠글자') || '').toString().trim();
       input.엄마글자 = (fd.get('엄마글자') || '').toString().trim();
       input.합성어순 = fd.get('합성어순') || '아빠먼저';
+
+      // 외국인 귀화 모드
+      input.외국인모드 = fd.get('외국인모드') === 'on';
+      input.본명원어 = (fd.get('본명원어') || '').toString().trim();
+      input.본명한국음 = (fd.get('본명한국음') || '').toString().trim();
+      input.본명뜻 = (fd.get('본명뜻') || '').toString().trim();
+      input.변환방식 = fd.get('변환방식') || 'mix';
     }
 
     lastPersonInput = input;
@@ -255,7 +272,23 @@ function renderPersonResult(result, input) {
     if (result.부모합성) {
       extraBadges += ` <span class="pill warn boost-badge">👨‍👩‍👧 부모 합성 · ${result.부모합성.어순}</span>`;
     }
+    if (result.외국인) {
+      extraBadges += ` <span class="pill ok boost-badge">🌐 본명 기반 · ${result.외국인.본명원어 || result.외국인.본명한국음}</span>`;
+    }
     html += `<h3 class="result-h">받아 든 이름들${extraBadges}</h3>`;
+
+    // 외국인 모드 — 본명 정보 박스
+    if (result.외국인) {
+      const f = result.외국인;
+      const 방식라벨 = { phonetic: '음역 위주', meaning: '의역 위주', mix: '음·뜻 함께' };
+      html += `<div class="foreign-card">
+        <div class="fc-row"><span class="lbl">본명</span><b>${f.본명원어 || '—'}</b></div>
+        ${f.본명한국음 ? `<div class="fc-row"><span class="lbl">한국 음</span><span>${f.본명한국음}</span></div>` : ''}
+        ${f.본명뜻 ? `<div class="fc-row"><span class="lbl">본명 뜻</span><span>${f.본명뜻}</span></div>` : ''}
+        ${f.매칭훈?.length ? `<div class="fc-row"><span class="lbl">매칭 한자 훈</span><span class="fc-tags">${f.매칭훈.slice(0, 8).map(t => `<span>${t}</span>`).join('')}</span></div>` : ''}
+        <div class="fc-row"><span class="lbl">변환</span><span>${방식라벨[f.변환방식] || f.변환방식}</span></div>
+      </div>`;
+    }
   }
 
   if (사주 && !태명만모드) {
