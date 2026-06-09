@@ -461,6 +461,208 @@ small.hint.warn { color: var(--gold); }
 .tm-boost-go { color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, var(--paper-3)); border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); }
 .tm-boost-go:hover { background: var(--gold); color: #fbf5e3; }
 
+/* ─── 폼 단계 카드 (사용성 정리) ─── */
+.step-card {
+  background: var(--paper-3);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-3);
+  padding: 0;
+  margin-bottom: var(--s-3);
+  overflow: hidden;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.step-card:hover { border-color: var(--line); }
+.step-card .step-head,
+.step-card > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line-2);
+  cursor: default;
+  user-select: none;
+}
+.step-card > summary {
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+}
+.step-card > summary::-webkit-details-marker { display: none; }
+.step-card > summary::after {
+  content: "▾";
+  position: absolute;
+  right: var(--s-4);
+  color: var(--ink-3);
+  font-size: 14px;
+  transition: transform 200ms;
+}
+.step-card[open] > summary::after { transform: rotate(180deg); }
+.step-card[open] > summary { border-bottom-color: var(--line); }
+.step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: var(--coral);
+  color: #fbf5e3;
+  font-family: var(--f-serif);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.step-card .step-head > div,
+.step-card > summary > div {
+  flex: 1;
+  min-width: 0;
+}
+.step-card h4 {
+  margin: 0;
+  font-family: var(--f-serif);
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.step-card h4 .optional {
+  font-family: var(--f-sans);
+  color: var(--ink-3);
+  font-weight: 500;
+  font-size: 11.5px;
+  margin-left: 4px;
+}
+.step-card .step-head p,
+.step-card > summary p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.step-card .step-body {
+  padding: var(--s-4);
+}
+.step-card label[for], .step-card .field > label, .step-card label:not(.mode-toggle):not(.checks > label) {
+  /* 내부 라벨이 카드 헤더와 겹치지 않게 */
+}
+
+/* 큰 라디오 (구분 선택) — 카드형 */
+.big-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--s-2);
+}
+.big-checks > label {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: var(--s-3) var(--s-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  transition: all 180ms;
+}
+.big-checks > label:has(input:checked) {
+  background: color-mix(in srgb, var(--coral) 8%, var(--paper-2));
+  border-color: var(--coral);
+  box-shadow: 0 0 0 2px var(--coral-glow);
+}
+.big-checks > label input[type="radio"] {
+  margin: 0;
+  accent-color: var(--coral);
+}
+.big-checks span {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.big-checks span small {
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+
+/* 특별 모드 블록 */
+.special-section .step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.mode-block {
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-2);
+  background: var(--paper-2);
+  overflow: hidden;
+  transition: border-color 200ms, background 200ms;
+}
+.mode-block:has(.mode-toggle input:checked) {
+  border-color: var(--coral);
+  background: color-mix(in srgb, var(--coral) 4%, var(--paper-2));
+}
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-3);
+  cursor: pointer;
+  user-select: none;
+}
+.mode-toggle input[type="checkbox"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--coral);
+  flex-shrink: 0;
+}
+.mode-icon {
+  font-size: 18px;
+  width: 28px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.mode-title {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.mode-title small {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+.mode-body {
+  padding: 0 var(--s-3) var(--s-3);
+  border-top: 1px dashed var(--line-2);
+  padding-top: var(--s-3);
+  margin-top: var(--s-1);
+}
+.mode-body > label {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: var(--s-2);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* form 자체의 외곽 padding 줄여서 카드들이 더 잘 보이게 */
+.tab-pane[data-tab="person"] .form { padding: var(--s-5) var(--s-4); }
+
+/* 기존 .field 스타일은 카드 안에서 사용 안 함 — 카드 자체가 .field 역할 */
+.step-card .field { margin-bottom: var(--s-3); }
+.step-card .field:last-child { margin-bottom: 0; }
+
 /* ─── 빈 결과 안내 ─── */
 .empty-result {
   background: var(--paper-2);
@@ -653,170 +855,245 @@ small.hint.warn { color: var(--gold); }
     <h3>인물·개명 작명</h3>
     <p class="sub" id="person-sub">아직 태어나지 않은 아기는 <b>출산 예정일</b>로, 이미 태어난 분의 개명은 <b>실제 생년월일</b>로 입력해 주세요. 모르면 비워도 됩니다.</p>
 
-    <div class="field">
-      <label>구분</label>
-      <div class="checks">
-        <label><input type="radio" name="구분" value="신생아" checked> 신생아(예정)</label>
-        <label><input type="radio" name="구분" value="개명"> 개명(이미 태어남)</label>
-        <label><input type="radio" name="구분" value="태명만"> 태명만 짓기</label>
-      </div>
-    </div>
-
-    <div class="field row person-bonmyung-field">
-      <div>
-        <label>성(姓)</label>
-        <input type="text" name="성" placeholder="예) 김">
-      </div>
-      <div>
-        <label>성별</label>
-        <select name="성별">
-          <option value="u">선택 안 함</option>
-          <option value="m">남</option>
-          <option value="f">여</option>
-        </select>
-      </div>
-      <div>
-        <label>음절</label>
-        <select name="음절">
-          <option value="2" selected>두 글자</option>
-          <option value="1">외자(한 글자)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field row" id="person-date-row">
-      <div>
-        <label data-신생아="예정 연도" data-개명="생년">예정 연도</label>
-        <input type="number" name="생년" min="1900" max="2099" placeholder="2026">
-      </div>
-      <div>
-        <label data-신생아="예정 월" data-개명="생월">예정 월</label>
-        <input type="number" name="생월" min="1" max="12" placeholder="6">
-      </div>
-      <div>
-        <label data-신생아="예정 일" data-개명="생일">예정 일</label>
-        <input type="number" name="생일" min="1" max="31" placeholder="15">
-      </div>
-      <div>
-        <label data-신생아="예정 시각 (0~23, 제왕절개 등)" data-개명="출생시간 (0~23)">예정 시각 (0~23, 제왕절개 등)</label>
-        <input type="number" name="생시" min="0" max="23" placeholder="모르면 빈칸">
-      </div>
-    </div>
-    <small class="hint" id="person-date-hint">예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.</small>
-
-    <div class="field person-bonmyung-field">
-      <label>이름 옵션</label>
-      <div class="checks">
-        <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
-        <label><input type="checkbox" name="옛스러움제외" checked> 옛스러운 이름 제외 (현대 트렌드 우선)</label>
-      </div>
-    </div>
-
-    <div class="field row person-bonmyung-field">
-      <div>
-        <label>항렬자(돌림자) — 선택</label>
-        <input type="text" name="항렬자" placeholder="예) 賢" maxlength="1">
-      </div>
-      <div>
-        <label>항렬자 위치</label>
-        <select name="항렬위치">
-          <option value="뒤">두 번째 글자</option>
-          <option value="첫">첫 글자</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label>원하는 느낌 (선택 — 여러 개 가능)</label>
-      <div class="chips" id="person-keywords"></div>
-    </div>
-
-    <!-- 이름지정 옵션 — 한글 이름은 정해두고 한자만 받기 -->
-    <div class="field person-bonmyung-field">
-      <label>특별 모드 — 이름 지정</label>
-      <div class="checks">
-        <label><input type="checkbox" name="이름지정"> 한글 이름은 정해뒀어요 — 사주에 맞는 한자만 골라주세요</label>
-      </div>
-    </div>
-    <div class="field person-bonmyung-field" id="name-fixed-fields" style="display:none">
-      <label>지정한 한글 이름 (1~3자)</label>
-      <input type="text" name="지정이름" placeholder="예) 민준, 도윤, 서연, 솔" maxlength="3">
-      <small class="hint">입력한 한글 이름은 그대로 두고, 각 음절에 어울리는 한자 조합을 사주·키워드·운세 기준으로 골라드려요.</small>
-    </div>
-
-    <!-- 부모 합성 옵션 -->
-    <div class="field person-bonmyung-field">
-      <label>특별 모드 — 부모 합성</label>
-      <div class="checks">
-        <label><input type="checkbox" name="부모합성"> 부모 두 사람 이름에서 한 글자씩 따와서 짓기</label>
-      </div>
-    </div>
-    <div class="field row person-bonmyung-field" id="parent-merge-fields" style="display:none">
-      <div>
-        <label>아빠 이름에서 따올 한 글자</label>
-        <input type="text" name="아빠글자" placeholder="예) 영" maxlength="1">
-      </div>
-      <div>
-        <label>엄마 이름에서 따올 한 글자</label>
-        <input type="text" name="엄마글자" placeholder="예) 지" maxlength="1">
-      </div>
-      <div>
-        <label>어순</label>
-        <select name="합성어순">
-          <option value="아빠먼저">아빠 + 엄마</option>
-          <option value="엄마먼저">엄마 + 아빠</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 외국인 귀화 모드 -->
-    <div class="field person-bonmyung-field">
-      <label>외국인 귀화·국제결혼</label>
-      <div class="checks">
-        <label><input type="checkbox" name="외국인모드"> 본명(영문·한자·일본어 등)으로 한국 이름 짓기</label>
-      </div>
-    </div>
-    <div class="field person-bonmyung-field" id="foreign-fields" style="display:none">
-      <div class="row">
+    <!-- ── ① 누구를 위한 작명? ── -->
+    <section class="step-card">
+      <header class="step-head">
+        <span class="step-num">1</span>
         <div>
-          <label>본명 (원어 표기)</label>
-          <input type="text" name="본명원어" placeholder="예) Sophia, 王雷, ゆうき, María">
+          <h4>누구를 위한 작명인가요?</h4>
+          <p>신생아·개명·태명만 — 세 가지 중에서</p>
         </div>
-        <div>
-          <label>한국식 음 표기</label>
-          <input type="text" name="본명한국음" placeholder="예) 소피아, 왕뢰, 유키, 마리아">
-        </div>
-      </div>
-      <div class="field" style="margin-top: 12px;">
-        <label>본명 뜻 (자유 입력 — 한국어/영어 다 가능)</label>
-        <input type="text" name="본명뜻" placeholder="예) 지혜 / wisdom / 천둥 강한 / 봄꽃">
-        <small class="hint">사용자가 입력한 뜻에서 키워드를 뽑아 비슷한 의미의 한자를 우선 추천합니다. Sophia·Sakura·Yuki 같은 흔한 이름은 자동으로 뜻이 가산돼요.</small>
-      </div>
-      <div class="field">
-        <label>변환 방식</label>
-        <div class="checks">
-          <label><input type="radio" name="변환방식" value="mix" checked> 음·뜻 함께 (권장)</label>
-          <label><input type="radio" name="변환방식" value="phonetic"> 음역 위주 (소리)</label>
-          <label><input type="radio" name="변환방식" value="meaning"> 의역 위주 (뜻)</label>
+      </header>
+      <div class="step-body">
+        <div class="checks big-checks">
+          <label><input type="radio" name="구분" value="신생아" checked> <span>🍼 신생아<small>예정일 기준</small></span></label>
+          <label><input type="radio" name="구분" value="개명"> <span>📝 개명<small>이미 태어남</small></span></label>
+          <label><input type="radio" name="구분" value="태명만"> <span>🌱 태명만<small>본명 없이</small></span></label>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- 태명 옵션 — 신생아일 때만 보임 -->
-    <div id="person-taemyung-fields">
-      <div class="field">
-        <label>태명 (신생아일 때 함께 추천)</label>
+    <!-- ── ② 기본 정보 ── -->
+    <section class="step-card person-bonmyung-field">
+      <header class="step-head">
+        <span class="step-num">2</span>
+        <div>
+          <h4>기본 정보</h4>
+          <p>성·성별·음절 (성별 선택 시 더 정확)</p>
+        </div>
+      </header>
+      <div class="step-body">
+        <div class="row">
+          <div>
+            <label>성(姓)</label>
+            <input type="text" name="성" placeholder="예) 김">
+          </div>
+          <div>
+            <label>성별</label>
+            <select name="성별">
+              <option value="u">선택 안 함</option>
+              <option value="m">남</option>
+              <option value="f">여</option>
+            </select>
+          </div>
+          <div>
+            <label>음절</label>
+            <select name="음절">
+              <option value="2" selected>두 글자</option>
+              <option value="1">외자(한 글자)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ③ 사주 정보 ── -->
+    <section class="step-card">
+      <header class="step-head">
+        <span class="step-num">3</span>
+        <div>
+          <h4>사주 정보</h4>
+          <p>생년월일시 — 모르면 비워도 됩니다</p>
+        </div>
+      </header>
+      <div class="step-body">
+        <div class="row" id="person-date-row">
+          <div>
+            <label data-신생아="예정 연도" data-개명="생년">예정 연도</label>
+            <input type="number" name="생년" min="1900" max="2099" placeholder="2026">
+          </div>
+          <div>
+            <label data-신생아="예정 월" data-개명="생월">예정 월</label>
+            <input type="number" name="생월" min="1" max="12" placeholder="6">
+          </div>
+          <div>
+            <label data-신생아="예정 일" data-개명="생일">예정 일</label>
+            <input type="number" name="생일" min="1" max="31" placeholder="15">
+          </div>
+          <div>
+            <label data-신생아="예정 시각 (0~23)" data-개명="출생시간 (0~23)">예정 시각 (0~23)</label>
+            <input type="number" name="생시" min="0" max="23" placeholder="모르면 빈칸">
+          </div>
+        </div>
+        <small class="hint" id="person-date-hint">예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.</small>
+      </div>
+    </section>
+
+    <!-- ── ④ 원하는 느낌 ── -->
+    <section class="step-card">
+      <header class="step-head">
+        <span class="step-num">4</span>
+        <div>
+          <h4>원하는 느낌</h4>
+          <p>여러 개 선택 가능</p>
+        </div>
+      </header>
+      <div class="step-body">
+        <div class="chips" id="person-keywords"></div>
+      </div>
+    </section>
+
+    <!-- ── ⑤ 특별 모드 ── -->
+    <section class="step-card person-bonmyung-field special-section">
+      <header class="step-head">
+        <span class="step-num">5</span>
+        <div>
+          <h4>특별 모드 <small class="optional">(선택)</small></h4>
+          <p>3가지 중 하나 또는 여러 개 동시 사용 가능</p>
+        </div>
+      </header>
+      <div class="step-body">
+
+        <!-- 한글 이름 지정 -->
+        <div class="mode-block">
+          <label class="mode-toggle">
+            <input type="checkbox" name="이름지정">
+            <span class="mode-icon">📝</span>
+            <span class="mode-title">한글 이름 지정<small>한글은 정해뒀고 한자만 받기</small></span>
+          </label>
+          <div class="mode-body" id="name-fixed-fields" style="display:none">
+            <label>지정한 한글 이름 (1~3자)</label>
+            <input type="text" name="지정이름" placeholder="예) 민준, 도윤, 서연, 솔" maxlength="3">
+            <small class="hint">입력한 한글은 그대로 두고, 각 음절에 어울리는 한자 조합을 사주·키워드 기준으로 골라드려요.</small>
+          </div>
+        </div>
+
+        <!-- 부모 합성 -->
+        <div class="mode-block">
+          <label class="mode-toggle">
+            <input type="checkbox" name="부모합성">
+            <span class="mode-icon">👨‍👩‍👧</span>
+            <span class="mode-title">부모 합성<small>두 사람 이름에서 한 글자씩</small></span>
+          </label>
+          <div class="mode-body" id="parent-merge-fields" style="display:none">
+            <div class="row">
+              <div>
+                <label>아빠 한 글자</label>
+                <input type="text" name="아빠글자" placeholder="예) 영" maxlength="1">
+              </div>
+              <div>
+                <label>엄마 한 글자</label>
+                <input type="text" name="엄마글자" placeholder="예) 지" maxlength="1">
+              </div>
+              <div>
+                <label>어순</label>
+                <select name="합성어순">
+                  <option value="아빠먼저">아빠 + 엄마</option>
+                  <option value="엄마먼저">엄마 + 아빠</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 외국인 귀화 -->
+        <div class="mode-block">
+          <label class="mode-toggle">
+            <input type="checkbox" name="외국인모드">
+            <span class="mode-icon">🌐</span>
+            <span class="mode-title">외국인 귀화·국제결혼<small>본명(영문·한자·일본어)으로 한국 이름</small></span>
+          </label>
+          <div class="mode-body" id="foreign-fields" style="display:none">
+            <div class="row">
+              <div>
+                <label>본명 (원어)</label>
+                <input type="text" name="본명원어" placeholder="예) Sophia, 王雷, ゆうき">
+              </div>
+              <div>
+                <label>한국식 음</label>
+                <input type="text" name="본명한국음" placeholder="예) 소피아, 왕뢰, 유키">
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <label>본명 뜻 (한·영 자유)</label>
+              <input type="text" name="본명뜻" placeholder="예) 지혜 / wisdom / 봄꽃">
+              <small class="hint">Sophia·Sakura·Yuki 같은 흔한 이름은 자동으로 뜻이 가산됩니다.</small>
+            </div>
+            <div style="margin-top: 12px;">
+              <label>변환 방식</label>
+              <div class="checks">
+                <label><input type="radio" name="변환방식" value="mix" checked> 음·뜻 함께</label>
+                <label><input type="radio" name="변환방식" value="phonetic"> 음역 위주</label>
+                <label><input type="radio" name="변환방식" value="meaning"> 의역 위주</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── ⑥ 태명 (신생아·태명만) ── -->
+    <section class="step-card" id="person-taemyung-fields">
+      <header class="step-head">
+        <span class="step-num">6</span>
+        <div>
+          <h4>🌱 태명 옵션</h4>
+          <p>신생아일 때 본명과 함께, 또는 태명만 모드일 때 노출</p>
+        </div>
+      </header>
+      <div class="step-body">
         <div class="checks">
           <label><input type="checkbox" name="태명함께" checked> 본명과 함께 태명도 받기</label>
-          <label><input type="checkbox" name="형제자매"> 위에 형/누나·언니/오빠 있음</label>
+          <label><input type="checkbox" name="형제자매"> 위에 형·누나·언니·오빠 있음</label>
+        </div>
+        <div style="margin-top: 12px;">
+          <label>윗아이 이름·태명 (운율 맞추기 — 선택)</label>
+          <input type="text" name="윗아이" placeholder="예) 콩이, 두부, 별이" maxlength="6">
+          <small class="hint">윗아이 끝 글자에 맞춰 운율 비슷한 태명을 우선 추천.</small>
         </div>
       </div>
-      <div class="field">
-        <label>윗아이 이름 또는 태명 (운율 맞추기 — 선택)</label>
-        <input type="text" name="윗아이" placeholder="예) 콩이, 두부, 별이" maxlength="6">
-        <small class="hint">윗아이 끝 글자에 맞춰 운율이 비슷한 태명을 더 우선 추천합니다.</small>
+    </section>
+
+    <!-- ── ⑦ 고급 옵션 (접힘) ── -->
+    <details class="step-card advanced-section person-bonmyung-field">
+      <summary>
+        <span class="step-num">7</span>
+        <div>
+          <h4>고급 옵션 <small class="optional">(펼치기)</small></h4>
+          <p>한자 사용·옛스러움·항렬자</p>
+        </div>
+      </summary>
+      <div class="step-body">
+        <div class="checks">
+          <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
+          <label><input type="checkbox" name="옛스러움제외" checked> 옛스러운 이름 제외 (현대 트렌드 우선)</label>
+        </div>
+        <div class="row" style="margin-top: 16px;">
+          <div>
+            <label>항렬자(돌림자) — 선택</label>
+            <input type="text" name="항렬자" placeholder="예) 賢" maxlength="1">
+          </div>
+          <div>
+            <label>항렬자 위치</label>
+            <select name="항렬위치">
+              <option value="뒤">두 번째 글자</option>
+              <option value="첫">첫 글자</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
+    </details>
 
     <button class="submit" type="submit">이름 받아오기</button>
   </form>
