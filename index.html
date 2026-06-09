@@ -161,15 +161,131 @@ main { max-width: 1180px; margin: 0 auto; padding: var(--s-6) var(--s-6) var(--s
 .form h3 { font-family: var(--f-serif); font-size: 20px; font-weight: 700; margin: 0 0 var(--s-1); letter-spacing: -0.02em; }
 .form .sub { color: var(--ink-2); margin: 0 0 var(--s-5); font-size: 13.5px; line-height: 1.65; }
 .field { display: block; margin-bottom: var(--s-4); }
-.field > label { display: block; font-size: 12px; color: var(--ink-3); margin-bottom: var(--s-2); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
-.field input[type="text"], .field input[type="number"], .field select {
-  width: 100%; background: var(--paper-3); color: var(--ink);
-  border: 1px solid var(--line); border-radius: var(--r-2);
-  padding: var(--s-3); font-size: 14.5px; font-family: inherit;
-  transition: border-color 200ms, box-shadow 200ms;
+/* ─── 라벨 ─── */
+.field > label,
+.step-card label:not(.mode-toggle):not(.checks > label):not(.big-checks > label),
+.mode-body > label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin-bottom: var(--s-2);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-transform: none;
 }
-.field input:focus, .field select:focus { outline: none; border-color: var(--coral); box-shadow: 0 0 0 3px var(--coral-glow); }
-.field input::placeholder { color: var(--ink-4); }
+
+/* ─── 공통 입력 ─── */
+.field input[type="text"],
+.field input[type="number"],
+.field select,
+.step-card input[type="text"],
+.step-card input[type="number"],
+.step-card select,
+.mode-body input[type="text"],
+.mode-body input[type="number"],
+.mode-body select {
+  width: 100%;
+  height: 42px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: 0 var(--s-3);
+  font-size: 14.5px;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: border-color 180ms, box-shadow 180ms, background 180ms;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* select 커스텀 화살표 */
+.field select,
+.step-card select,
+.mode-body select {
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238a7d65' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--s-3) center;
+  background-size: 11px 7px;
+  cursor: pointer;
+}
+
+[data-theme="light"] .field select,
+[data-theme="light"] .step-card select,
+[data-theme="light"] .mode-body select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238a7a60' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* hover */
+.field input:hover,
+.field select:hover,
+.step-card input:hover,
+.step-card select:hover {
+  border-color: var(--ink-4);
+  background: color-mix(in srgb, var(--paper) 80%, var(--paper-2));
+}
+
+/* focus */
+.field input:focus,
+.field select:focus,
+.step-card input:focus,
+.step-card select:focus,
+.mode-body input:focus,
+.mode-body select:focus {
+  outline: none;
+  border-color: var(--coral);
+  background: var(--paper);
+  box-shadow: 0 0 0 3px var(--coral-glow);
+}
+
+/* placeholder */
+.field input::placeholder,
+.step-card input::placeholder,
+.mode-body input::placeholder {
+  color: var(--ink-4);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+/* 숫자 input 스피너(▲▼) 제거 */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 비활성 상태 */
+.field input:disabled,
+.field select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* maxlength=1 한 글자 입력은 더 깔끔하게 (한자/항렬자) */
+.field input[maxlength="1"],
+.step-card input[maxlength="1"] {
+  text-align: center;
+  font-family: var(--f-serif);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* 작은 hint 텍스트 */
+.step-card small.hint,
+.mode-body small.hint {
+  margin-top: var(--s-2);
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  display: block;
+}
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--s-3); }
 .checks { display: flex; flex-wrap: wrap; gap: var(--s-4); font-size: 14px; margin-top: var(--s-1); }
 .checks label { color: var(--ink-2); display: inline-flex; gap: var(--s-2); align-items: center; cursor: pointer; font-weight: 500; }
