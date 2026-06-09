@@ -461,6 +461,18 @@ small.hint.warn { color: var(--gold); }
 .tm-boost-go { color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, var(--paper-3)); border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); }
 .tm-boost-go:hover { background: var(--gold); color: #fbf5e3; }
 
+/* ─── 빈 결과 안내 ─── */
+.empty-result {
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-3);
+  padding: var(--s-5) var(--s-5);
+  text-align: center;
+  color: var(--ink-2);
+}
+.empty-result p { margin: var(--s-2) 0; font-size: 14px; line-height: 1.6; }
+.empty-result b { color: var(--ink); font-weight: 700; }
+
 /* ─── 외국인 본명 카드 ─── */
 .foreign-card {
   background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--teal) 6%, transparent), transparent 50%), var(--paper-2);
@@ -717,6 +729,19 @@ small.hint.warn { color: var(--gold); }
     <div class="field">
       <label>원하는 느낌 (선택 — 여러 개 가능)</label>
       <div class="chips" id="person-keywords"></div>
+    </div>
+
+    <!-- 이름지정 옵션 — 한글 이름은 정해두고 한자만 받기 -->
+    <div class="field person-bonmyung-field">
+      <label>특별 모드 — 이름 지정</label>
+      <div class="checks">
+        <label><input type="checkbox" name="이름지정"> 한글 이름은 정해뒀어요 — 사주에 맞는 한자만 골라주세요</label>
+      </div>
+    </div>
+    <div class="field person-bonmyung-field" id="name-fixed-fields" style="display:none">
+      <label>지정한 한글 이름 (1~3자)</label>
+      <input type="text" name="지정이름" placeholder="예) 민준, 도윤, 서연, 솔" maxlength="3">
+      <small class="hint">입력한 한글 이름은 그대로 두고, 각 음절에 어울리는 한자 조합을 사주·키워드·운세 기준으로 골라드려요.</small>
     </div>
 
     <!-- 부모 합성 옵션 -->

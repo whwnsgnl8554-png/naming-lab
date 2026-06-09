@@ -161,6 +161,15 @@ function initPersonForm() {
   form.querySelectorAll('input[name="구분"]').forEach(r => r.addEventListener('change', 구분동기화));
   구분동기화();
 
+  // 이름지정 토글
+  const 이름지정체크 = form.querySelector('input[name="이름지정"]');
+  const 이름지정필드 = $('#name-fixed-fields');
+  if (이름지정체크 && 이름지정필드) {
+    이름지정체크.addEventListener('change', () => {
+      이름지정필드.style.display = 이름지정체크.checked ? '' : 'none';
+    });
+  }
+
   // 부모 합성 체크 → 입력 두 칸 토글
   const 합성체크 = form.querySelector('input[name="부모합성"]');
   const 합성필드 = $('#parent-merge-fields');
@@ -206,6 +215,12 @@ function initPersonForm() {
       input.태명함께 = input.구분 === '태명만' ? true : (fd.get('태명함께') === 'on');
       input.형제자매 = fd.get('형제자매') === 'on';
       input.윗아이 = (fd.get('윗아이') || '').toString().trim();
+    }
+
+    // 이름지정 모드
+    if (input.구분 !== '태명만') {
+      input.이름지정 = fd.get('이름지정') === 'on';
+      input.지정이름 = (fd.get('지정이름') || '').toString().trim();
     }
 
     // 부모 합성 모드
@@ -275,6 +290,9 @@ function renderPersonResult(result, input) {
     if (result.외국인) {
       extraBadges += ` <span class="pill ok boost-badge">🌐 본명 기반 · ${result.외국인.본명원어 || result.외국인.본명한국음}</span>`;
     }
+    if (result.지정모드) {
+      extraBadges += ` <span class="pill ok boost-badge">📝 이름 지정 · ${result.지정모드.이름}</span>`;
+    }
     html += `<h3 class="result-h">받아 든 이름들${extraBadges}</h3>`;
 
     // 외국인 모드 — 본명 정보 박스
@@ -315,11 +333,27 @@ function renderPersonResult(result, input) {
   }
 
   if (!태명만모드) {
-    html += `<div class="cards">`;
-    for (const c of result.후보들) {
-      html += renderPersonCard(c);
+    if (result.후보들.length === 0) {
+      // 빈 결과 — 이유와 대안 안내
+      let 이유 = '';
+      if (result.지정모드) {
+        이유 = `<b>"${result.지정모드.이름}"</b>의 음 중에 한자가 없는 음절이 있어요. 다른 한국식 음 표기를 시도해보거나(예: 쟈→자, 캐→가), 한자 사용 옵션을 끄면 순한글 그대로 받을 수 있어요.`;
+      } else if (result.부모합성) {
+        이유 = `부모 이름 두 글자의 음에 맞는 한자가 부족해요. 한국 인명용 한자에 없는 음(예: 쟈, 펴, 컬 등)은 매칭이 어렵습니다.`;
+      } else {
+        이유 = `조건이 너무 좁아 후보가 안 나왔어요. 키워드를 줄이거나 "옛스러운 이름 제외" 옵션을 꺼보세요.`;
+      }
+      html += `<div class="empty-result">
+        <p><b>추천할 한자 조합을 찾지 못했어요</b></p>
+        <p>${이유}</p>
+      </div>`;
+    } else {
+      html += `<div class="cards">`;
+      for (const c of result.후보들) {
+        html += renderPersonCard(c);
+      }
+      html += `</div>`;
     }
-    html += `</div>`;
   }
 
   // 태명 섹션 (신생아 + 태명함께 체크, 또는 태명만 모드)
