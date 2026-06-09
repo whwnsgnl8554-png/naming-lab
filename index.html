@@ -34,6 +34,7 @@
   --teal:       #4a9b7f;   --teal-soft:  #6db49a;   --teal-glow:  rgba(74,155,127,.2);
   --gold:       #b89043;   --gold-soft:  #cda968;
   --hanji:      rgba(184,144,67,.025);
+  --hanja-pattern: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cg font-family='Gowun Batang, Noto Serif KR, serif' font-weight='700' fill='%23b89043'%3E%3Ctext x='40' y='110' font-size='90' opacity='0.040'%3E命%3C/text%3E%3Ctext x='300' y='160' font-size='72' opacity='0.032'%3E運%3C/text%3E%3Ctext x='450' y='90' font-size='58' opacity='0.028'%3E福%3C/text%3E%3Ctext x='90' y='280' font-size='62' opacity='0.026'%3E名%3C/text%3E%3Ctext x='230' y='320' font-size='80' opacity='0.036'%3E德%3C/text%3E%3Ctext x='420' y='280' font-size='68' opacity='0.030'%3E壽%3C/text%3E%3Ctext x='30' y='450' font-size='74' opacity='0.032'%3E仁%3C/text%3E%3Ctext x='270' y='510' font-size='66' opacity='0.028'%3E禮%3C/text%3E%3Ctext x='450' y='480' font-size='90' opacity='0.038'%3E智%3C/text%3E%3C/g%3E%3C/svg%3E");
   --s-1: 4px;  --s-2: 8px;  --s-3: 12px;  --s-4: 16px;  --s-5: 24px;  --s-6: 32px;  --s-7: 48px;  --s-8: 64px;
   --r-1: 6px;  --r-2: 10px; --r-3: 14px;  --r-4: 20px;  --r-full: 999px;
   --sh-1: 0 1px 2px rgba(0,0,0,.18), 0 1px 3px rgba(0,0,0,.12);
@@ -51,6 +52,7 @@
   --teal:       #2f7a5e;   --teal-soft:  #54a087;   --teal-glow:  rgba(47,122,94,.16);
   --gold:       #a07a30;   --gold-soft:  #b8954c;
   --hanji:      rgba(120,90,40,.04);
+  --hanja-pattern: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='560' height='560' viewBox='0 0 560 560'%3E%3Cg font-family='Gowun Batang, Noto Serif KR, serif' font-weight='700' fill='%2375521a'%3E%3Ctext x='40' y='110' font-size='90' opacity='0.075'%3E命%3C/text%3E%3Ctext x='300' y='160' font-size='72' opacity='0.062'%3E運%3C/text%3E%3Ctext x='450' y='90' font-size='58' opacity='0.056'%3E福%3C/text%3E%3Ctext x='90' y='280' font-size='62' opacity='0.050'%3E名%3C/text%3E%3Ctext x='230' y='320' font-size='80' opacity='0.070'%3E德%3C/text%3E%3Ctext x='420' y='280' font-size='68' opacity='0.060'%3E壽%3C/text%3E%3Ctext x='30' y='450' font-size='74' opacity='0.062'%3E仁%3C/text%3E%3Ctext x='270' y='510' font-size='66' opacity='0.054'%3E禮%3C/text%3E%3Ctext x='450' y='480' font-size='90' opacity='0.072'%3E智%3C/text%3E%3C/g%3E%3C/svg%3E");
   --sh-1: 0 1px 2px rgba(67,42,14,.06), 0 1px 3px rgba(67,42,14,.05);
   --sh-2: 0 4px 12px rgba(67,42,14,.10), 0 8px 20px rgba(67,42,14,.06);
   --sh-3: 0 12px 28px rgba(67,42,14,.14), 0 24px 48px rgba(67,42,14,.08);
@@ -62,15 +64,45 @@ body {
   font-family: var(--f-sans);
   color: var(--ink);
   background:
+    /* 한자 패턴 — 命·運·名·福·壽·德 흩어진 SVG (다크 모드용 골드) */
+    var(--hanja-pattern),
+    /* 코랄·청록 글로우 (기존) */
     radial-gradient(ellipse at 0% 0%, var(--coral-glow) 0%, transparent 38%),
     radial-gradient(ellipse at 100% 100%, var(--teal-glow) 0%, transparent 42%),
+    /* 한지 결 — 두 방향 + 미세 노이즈 */
     repeating-linear-gradient(135deg, var(--hanji) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(45deg, var(--hanji) 0 1px, transparent 1px 11px),
     var(--paper);
   background-attachment: fixed;
+  background-size: 560px 560px, auto, auto, auto, auto, auto;
   min-height: 100vh;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.005em;
+  position: relative;
+  z-index: 0;
+}
+
+/* 모서리 인장 모티프 — 사주의 4기둥(연·월·일·시) 상징 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 240px; height: 240px;
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--coral) 7%, transparent) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+body::after {
+  content: "";
+  position: fixed;
+  bottom: 0; right: 0;
+  width: 280px; height: 280px;
+  background:
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--teal) 8%, transparent) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
 }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
