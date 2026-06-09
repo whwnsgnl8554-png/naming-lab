@@ -469,6 +469,92 @@ small.hint.warn { color: var(--gold); }
   border-color: var(--teal);
 }
 
+/* ─── 태명 섹션 ─── */
+.taemyung-block {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px dashed var(--card-border);
+}
+.tm-head { margin-bottom: 18px; }
+.tm-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tm-h::before {
+  content: '🌱';
+  font-size: 22px;
+}
+.tm-cards {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.tm-card {
+  background:
+    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 60%),
+    var(--card);
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, var(--card-border));
+  border-radius: 14px;
+  padding: 16px 18px 14px;
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: 0.2s;
+}
+.tm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px var(--shadow);
+}
+.tm-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tm-name {
+  margin: 0;
+  font-family: 'Gowun Batang', serif;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.tm-badge {
+  background: color-mix(in srgb, var(--gold) 18%, transparent);
+  color: var(--gold);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.tm-comment {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 8px 0 10px;
+}
+.tm-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card-elev);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.tm-score span { color: var(--muted); }
+.tm-score b { font-family: 'Gowun Batang', serif; color: var(--gold); font-size: 16px; }
+.tm-note {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--card-elev);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
 .submit {
   background: var(--accent);
   color: #fff8e8;
@@ -877,6 +963,22 @@ footer .signature {
     <div class="field">
       <label>원하는 느낌 (선택 — 여러 개 가능)</label>
       <div class="chips" id="person-keywords"></div>
+    </div>
+
+    <!-- 태명 옵션 — 신생아일 때만 보임 -->
+    <div id="person-taemyung-fields">
+      <div class="field">
+        <label>태명 (신생아일 때 함께 추천)</label>
+        <div class="checks">
+          <label><input type="checkbox" name="태명함께" checked> 본명과 함께 태명도 받기</label>
+          <label><input type="checkbox" name="형제자매"> 위에 형/누나·언니/오빠 있음</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>윗아이 이름 또는 태명 (운율 맞추기 — 선택)</label>
+        <input type="text" name="윗아이" placeholder="예) 콩이, 두부, 별이" maxlength="6">
+        <small class="hint">윗아이 끝 글자에 맞춰 운율이 비슷한 태명을 더 우선 추천합니다.</small>
+      </div>
     </div>
 
     <button class="submit" type="submit">이름 받아오기</button>

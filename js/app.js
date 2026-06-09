@@ -4,6 +4,7 @@ import { 인물작명 } from './naming/person.js';
 import { 반려동물작명 } from './naming/pet.js';
 import { 회사작명 } from './naming/company.js';
 import { 닉네임작명 } from './naming/nickname.js';
+import { 태명작명 } from './naming/taemyung.js';
 import { GAME_ALIASES } from './data/nickname.js';
 import { mountExtraButton } from './ai.js';
 
@@ -121,13 +122,16 @@ function initPersonForm() {
   const 라벨들 = $$('#person-date-row label[data-신생아]');
   const 안내 = $('#person-date-hint');
   const sub = $('#person-sub');
+  const 태명필드 = $('#person-taemyung-fields');
   function 구분동기화() {
     const v = (form.querySelector('input[name="구분"]:checked') || {}).value || '신생아';
     for (const l of 라벨들) l.textContent = l.dataset[v];
+    // 태명은 신생아일 때만 의미 있음
+    if (태명필드) 태명필드.style.display = v === '신생아' ? '' : 'none';
     if (v === '신생아') {
       안내.textContent = '예정일은 변동될 수 있어 사주 결과가 실제 출생일과 다를 수 있습니다. 출산 후 정확한 생일로 다시 받아보시는 걸 권합니다.';
       안내.className = 'hint warn';
-      sub.innerHTML = '<b>출산 예정일</b>로 입력해 주세요. 예정일 기준으로 사주를 추정해, 부족한 오행을 채울 글자 위주로 추천합니다. 모르면 비워도 됩니다.';
+      sub.innerHTML = '<b>출산 예정일</b>로 입력해 주세요. 예정일 기준으로 사주를 추정해, 부족한 오행을 채울 글자 위주로 추천합니다. 본명과 함께 태명도 같이 받을 수 있어요.';
     } else {
       안내.textContent = '실제 생년월일을 그대로 입력해 주세요. 출생 시간을 알면 사주가 더 정확해져요.';
       안내.className = 'hint ok';
@@ -158,11 +162,28 @@ function initPersonForm() {
       input.항렬자 = 항렬[0];
       input.항렬위치 = fd.get('항렬위치') || '뒤';
     }
+    // 태명 옵션 (신생아일 때만 의미 있음)
+    if (input.구분 === '신생아') {
+      input.태명함께 = fd.get('태명함께') === 'on';
+      input.형제자매 = fd.get('형제자매') === 'on';
+      input.윗아이 = (fd.get('윗아이') || '').toString().trim();
+    }
+
     lastPersonInput = input;
     renderLoading('out-person', '먹을 갈고 종이를 펴는 중…');
     setTimeout(() => {
       const result = 인물작명(input);
-      renderPersonResult(result);
+      // 신생아 + 태명 함께 선택이면 태명도 같이 생성
+      if (input.구분 === '신생아' && input.태명함께) {
+        result.태명 = 태명작명({
+          예정월: input.생월,
+          키워드: input.키워드,
+          형제자매: input.형제자매,
+          윗아이: input.윗아이,
+          개수: 6,
+        });
+      }
+      renderPersonResult(result, input);
     }, 380);
   });
 }
@@ -173,7 +194,7 @@ function renderLoading(outId, msg) {
   el.innerHTML = `<div class="loading"><div class="brush"></div><p>${msg}</p></div>`;
 }
 
-function renderPersonResult(result) {
+function renderPersonResult(result, input) {
   const el = $('#out-person');
   const 사주 = result.사주;
   let html = `<section class="result-block">`;
@@ -203,6 +224,25 @@ function renderPersonResult(result) {
   }
   html += `</div>`;
 
+  // 태명 섹션 (신생아 + 태명함께 체크 시)
+  if (result.태명 && result.태명.후보들?.length) {
+    const t = result.태명;
+    html += `<section class="taemyung-block">
+      <header class="tm-head">
+        <h3 class="result-h tm-h">태명 — 9개월 동안 부를 이름</h3>
+        <p class="result-sub">
+          ${t.계절 ? `<b>${t.계절}</b>에 만날 아기에게 어울리는 톤으로 골랐어요. ` : ''}
+          본명과 다르게 사주·한자보단 부르기 좋고 따뜻한 느낌을 우선했어요.
+          ${t.형제자매 ? '윗아이 이름과 운율이 맞는 것도 한두 개 섞였어요.' : ''}
+        </p>
+      </header>
+      <div class="cards tm-cards">
+        ${t.후보들.map(renderTaemyungCard).join('')}
+      </div>
+      <p class="tm-note">태명은 보통 임신 5~7주차부터 부르기 시작해 출산 후 한동안 그대로 부르는 경우도 많아요. 너무 길게 짓기보단 한두 음절, 모음으로 끝나는 게 가장 부르기 좋습니다.</p>
+    </section>`;
+  }
+
   html += `<div class="actions"><button class="redo-btn" id="person-redo">다른 이름 다시 받기</button></div>`;
   html += `</section>`;
 
@@ -227,6 +267,19 @@ function renderPersonResult(result) {
       `).join('')
     }</div>`,
   });
+}
+
+function renderTaemyungCard(c) {
+  return `
+    <article class="tm-card">
+      <header>
+        <h4 class="tm-name">${c.이름}</h4>
+        <span class="tm-badge">${c.컨셉라벨}</span>
+      </header>
+      <p class="tm-comment">${c.코멘트}</p>
+      <div class="tm-score"><span>부르기 좋음</span><b>${c.부르기점수}</b></div>
+    </article>
+  `;
 }
 
 function renderPersonCard(c) {
