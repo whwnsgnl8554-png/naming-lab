@@ -256,10 +256,20 @@ function 부모합성작명({ 성, 성별, 첫음, 둘음, 한자사용, 사주,
   const 후보들 = [];
   const seen = new Set();
 
+  // 음 유사 매칭 (한자가 부족할 때 폴백) — ㅂ↔ㅁ 같은 한국식 변환은 안 하고
+  // 단순히 첫 자음이 같은 음으로만 폴백
+  const 음유사 = (target) => {
+    if (!target) return [];
+    return HANJA.filter(h => h.음[0] === target[0]);
+  };
+
   // 한자 사용: 첫음의 한자 × 둘음의 한자 조합
   if (한자사용) {
-    const 첫후보 = HANJA.filter(h => h.음 === 첫음);
-    const 둘후보 = HANJA.filter(h => h.음 === 둘음);
+    let 첫후보 = HANJA.filter(h => h.음 === 첫음);
+    let 둘후보 = HANJA.filter(h => h.음 === 둘음);
+    // 폴백: 정확한 음 한자가 부족하면 첫 자음이 같은 한자로 확장
+    if (첫후보.length < 3) 첫후보 = [...첫후보, ...음유사(첫음).slice(0, 6)];
+    if (둘후보.length < 3) 둘후보 = [...둘후보, ...음유사(둘음).slice(0, 6)];
 
     // 성별 일치 우선
     const 정렬 = arr => arr.slice().sort((a, b) => {
