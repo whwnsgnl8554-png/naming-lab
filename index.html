@@ -368,6 +368,144 @@ small.hint.warn { color: var(--gold); }
 .tm-score b { font-family: var(--f-serif); color: var(--gold); font-size: 15px; font-weight: 700; }
 .tm-note { margin-top: var(--s-4); padding: var(--s-3) var(--s-4); background: var(--paper-3); border-left: 3px solid var(--gold); border-radius: 0 var(--r-2) var(--r-2) 0; color: var(--ink-2); font-size: 13px; line-height: 1.65; }
 
+/* ─── 헤더 액션 + 저장함 ─── */
+.header-actions { display: flex; align-items: center; gap: var(--s-2); }
+.hdr-btn {
+  position: relative;
+  background: transparent; color: var(--ink-3);
+  border: 1px solid var(--line); border-radius: var(--r-full);
+  padding: var(--s-2) var(--s-3); font-size: 14px; line-height: 1;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: all 200ms;
+}
+.hdr-btn:hover { color: var(--coral); border-color: var(--coral); background: var(--paper-2); }
+.fav-count {
+  display: inline-block; min-width: 18px; padding: 0 5px; height: 16px;
+  background: var(--coral); color: #fbf5e3; font-size: 11px; font-weight: 700;
+  border-radius: var(--r-full); line-height: 16px; text-align: center;
+}
+.fav-count:empty, .fav-count[style*="display: none"] { display: none; }
+
+/* ─── 결과 액션 바 ─── */
+.result-actions {
+  display: flex; gap: var(--s-2); flex-wrap: wrap;
+  margin-bottom: var(--s-4); padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--line-2);
+}
+.result-act {
+  background: transparent; color: var(--ink-2); border: 1px solid var(--line);
+  border-radius: var(--r-full); padding: var(--s-2) var(--s-3);
+  font-size: 12.5px; font-weight: 500; transition: all 200ms;
+}
+.result-act:hover { color: var(--ink); border-color: var(--coral); background: var(--paper-2); }
+
+/* ─── 카드 액션 (좋아요·공유) ─── */
+.card-actions {
+  position: absolute; top: var(--s-2); right: var(--s-2);
+  display: flex; gap: 4px; opacity: 0; transition: opacity 200ms;
+}
+.name-card:hover .card-actions, .pet-card:hover .card-actions,
+.comp-card:hover .card-actions, .tm-card:hover .card-actions { opacity: 1; }
+.card-act {
+  width: 30px; height: 30px;
+  background: var(--paper-3); border: 1px solid var(--line);
+  border-radius: 50%; color: var(--ink-3);
+  font-size: 14px; line-height: 1;
+  display: inline-grid; place-items: center;
+  transition: all 180ms;
+}
+.card-act:hover { color: var(--ink); border-color: var(--coral); transform: scale(1.08); }
+.card-act.fav.on { color: var(--coral); background: color-mix(in srgb, var(--coral) 14%, transparent); border-color: var(--coral); }
+.card-act.remove { color: var(--ink-3); }
+.card-act.remove:hover { color: var(--coral); }
+.pet-card, .comp-card, .tm-card, .name-card { position: relative; }
+
+/* ─── 저장함 모달 ─── */
+.modal { position: fixed; inset: 0; z-index: 100; }
+.modal[hidden] { display: none; }
+.modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(4px); }
+.modal-box {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(540px, calc(100vw - 32px)); max-height: 80vh;
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--r-3);
+  box-shadow: var(--sh-3); display: flex; flex-direction: column;
+}
+.modal-head { display: flex; justify-content: space-between; align-items: center; padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--line); }
+.modal-head h3 { margin: 0; font-family: var(--f-serif); font-size: 18px; font-weight: 700; }
+.modal-close { background: transparent; border: 0; color: var(--ink-3); font-size: 22px; line-height: 1; padding: 0 var(--s-2); }
+.modal-close:hover { color: var(--ink); }
+.fav-list { padding: var(--s-3) var(--s-5); overflow-y: auto; flex: 1; }
+.fav-empty { color: var(--ink-3); font-size: 13.5px; text-align: center; padding: var(--s-7) 0; }
+.fav-item {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) 0; border-bottom: 1px solid var(--line-2);
+}
+.fav-item:last-child { border-bottom: 0; }
+.fav-main { flex: 1; min-width: 0; }
+.fav-type {
+  display: inline-block; font-size: 11px; color: var(--ink-3);
+  background: var(--paper-3); border: 1px solid var(--line); padding: 1px 8px;
+  border-radius: var(--r-full); font-weight: 500; margin-bottom: 4px;
+}
+.fav-item h4 { margin: 2px 0; font-family: var(--f-serif); font-size: 18px; font-weight: 700; display: flex; gap: var(--s-2); align-items: baseline; }
+.fav-han { color: var(--coral); letter-spacing: 0.08em; font-size: 20px; }
+.fav-meaning { margin: 4px 0 0; color: var(--ink-2); font-size: 12.5px; line-height: 1.4; }
+.fav-acts { display: flex; gap: 4px; }
+.modal-foot { padding: var(--s-3) var(--s-5); border-top: 1px solid var(--line); text-align: right; }
+
+/* ─── 태명 보강 ─── */
+.tm-boost { margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px dashed var(--line); }
+.tm-boost-h::before { content: '🌱'; color: var(--gold); }
+.tm-chip { font-size: 12px; padding: var(--s-1) var(--s-3); }
+.tm-chip.on { background: var(--gold); border-color: var(--gold); color: #fbf5e3; }
+.tm-boost-go { color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, var(--paper-3)); border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); }
+.tm-boost-go:hover { background: var(--gold); color: #fbf5e3; }
+
+/* ─── 인쇄 (PDF) ─── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+  .site-header, .tabs, .tab-pane:not(.active),
+  .form, .no-print, .card-actions, .ai-extra-wrap, .modal,
+  .actions, .unse-boost, .tm-boost, .intro-note, .faq,
+  .home-grid, .intro, footer .signature {
+    display: none !important;
+  }
+  main { max-width: none; padding: 0; }
+  .out { margin: 0; }
+  .result-block { animation: none; }
+  .result-h { color: black; font-size: 22pt; margin-bottom: 8pt; }
+  .saju-card, .unse-block, .name-card, .pet-card, .comp-card, .tm-card {
+    background: white !important;
+    border: 1px solid #333 !important;
+    color: black !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    margin-bottom: 8pt;
+  }
+  .saju-card::after, .unse-block::after { display: none !important; }
+  .nc-han .hanja { color: #b94527 !important; }
+  .nc-first { background: #fdf5dd !important; }
+  .cards { display: block; }
+  .cards .name-card, .cards .tm-card, .cards .pet-card, .cards .comp-card {
+    display: block; margin-bottom: 8pt;
+  }
+  .unse-bar i { background: #555 !important; }
+  /* 인쇄 헤더·푸터 */
+  body::before {
+    content: "작명연구소 · 명·운(命·運) 작명 결과지";
+    display: block;
+    font-family: 'Gowun Batang', serif;
+    font-size: 14pt;
+    border-bottom: 2px solid #333;
+    padding-bottom: 6pt;
+    margin-bottom: 12pt;
+  }
+}
+
 /* ─── 반응형 ─── */
 @media (max-width: 720px) {
   .site-header { padding: var(--s-3) var(--s-4); }
@@ -397,8 +535,29 @@ small.hint.warn { color: var(--gold); }
     <span class="seal">名</span>
     <h1>작명연구소<span class="sub">— 이름 짓는 자리</span></h1>
   </a>
-  <button id="theme-toggle" aria-label="다크/라이트">먹↔한지</button>
+  <div class="header-actions">
+    <button id="favorites-btn" class="hdr-btn" aria-label="저장함">
+      <span aria-hidden="true">♡</span>
+      <span class="fav-count" id="fav-count">0</span>
+    </button>
+    <button id="theme-toggle" aria-label="다크/라이트">먹↔한지</button>
+  </div>
 </header>
+
+<!-- 저장함 모달 -->
+<div id="fav-modal" class="modal" hidden>
+  <div class="modal-overlay" data-close></div>
+  <div class="modal-box" role="dialog" aria-label="저장한 이름">
+    <header class="modal-head">
+      <h3>저장한 이름</h3>
+      <button class="modal-close" data-close aria-label="닫기">×</button>
+    </header>
+    <div id="fav-list" class="fav-list"></div>
+    <footer class="modal-foot">
+      <button class="redo-btn" id="fav-clear">전부 비우기</button>
+    </footer>
+  </div>
+</div>
 
 <nav class="tabs" role="tablist">
   <button class="tab-btn active" data-tab="home" role="tab"><span class="num">序</span>처음</button>
@@ -534,6 +693,31 @@ small.hint.warn { color: var(--gold); }
     <div class="field">
       <label>원하는 느낌 (선택 — 여러 개 가능)</label>
       <div class="chips" id="person-keywords"></div>
+    </div>
+
+    <!-- 부모 합성 옵션 -->
+    <div class="field person-bonmyung-field">
+      <label>특별 모드 — 부모 합성</label>
+      <div class="checks">
+        <label><input type="checkbox" name="부모합성"> 부모 두 사람 이름에서 한 글자씩 따와서 짓기</label>
+      </div>
+    </div>
+    <div class="field row person-bonmyung-field" id="parent-merge-fields" style="display:none">
+      <div>
+        <label>아빠 이름에서 따올 한 글자</label>
+        <input type="text" name="아빠글자" placeholder="예) 영" maxlength="1">
+      </div>
+      <div>
+        <label>엄마 이름에서 따올 한 글자</label>
+        <input type="text" name="엄마글자" placeholder="예) 지" maxlength="1">
+      </div>
+      <div>
+        <label>어순</label>
+        <select name="합성어순">
+          <option value="아빠먼저">아빠 + 엄마</option>
+          <option value="엄마먼저">엄마 + 아빠</option>
+        </select>
+      </div>
     </div>
 
     <!-- 태명 옵션 — 신생아일 때만 보임 -->

@@ -7,6 +7,8 @@ import { 닉네임작명 } from './naming/nickname.js';
 import { 태명작명 } from './naming/taemyung.js';
 import { GAME_ALIASES } from './data/nickname.js';
 import { mountExtraButton } from './ai.js';
+import { getFavorites, isFavorite, toggleFavorite, removeFavorite, clearAll, makeId } from './util/favorites.js';
+import { downloadShareCard } from './util/share.js';
 
 // 마지막 폼 입력값 저장 — AI 추천 호출 시 재사용
 let lastPersonInput = null;
@@ -159,6 +161,15 @@ function initPersonForm() {
   form.querySelectorAll('input[name="구분"]').forEach(r => r.addEventListener('change', 구분동기화));
   구분동기화();
 
+  // 부모 합성 체크 → 입력 두 칸 토글
+  const 합성체크 = form.querySelector('input[name="부모합성"]');
+  const 합성필드 = $('#parent-merge-fields');
+  if (합성체크 && 합성필드) {
+    합성체크.addEventListener('change', () => {
+      합성필드.style.display = 합성체크.checked ? '' : 'none';
+    });
+  }
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     const fd = new FormData(form);
@@ -185,6 +196,14 @@ function initPersonForm() {
       input.태명함께 = input.구분 === '태명만' ? true : (fd.get('태명함께') === 'on');
       input.형제자매 = fd.get('형제자매') === 'on';
       input.윗아이 = (fd.get('윗아이') || '').toString().trim();
+    }
+
+    // 부모 합성 모드
+    if (input.구분 !== '태명만') {
+      input.부모합성 = fd.get('부모합성') === 'on';
+      input.아빠글자 = (fd.get('아빠글자') || '').toString().trim();
+      input.엄마글자 = (fd.get('엄마글자') || '').toString().trim();
+      input.합성어순 = fd.get('합성어순') || '아빠먼저';
     }
 
     lastPersonInput = input;
@@ -226,13 +245,17 @@ function renderPersonResult(result, input) {
   const 사주 = result.사주;
   const 태명만모드 = result._구분 === '태명만';
   let html = `<section class="result-block">`;
+  html += renderResultActions();
   if (!태명만모드) {
-    let boostBadge = '';
+    let extraBadges = '';
     if (result._보강운세?.length && result.운세) {
       const labels = result._보강운세.map(k => result.운세.운세[k]?.이름 || k).join('·');
-      boostBadge = ` <span class="pill ok boost-badge" title="이 운을 받치는 한자에 가중치를 추가했어요">✦ 보강 · ${labels}</span>`;
+      extraBadges += ` <span class="pill ok boost-badge" title="이 운을 받치는 한자에 가중치를 추가했어요">✦ 보강 · ${labels}</span>`;
     }
-    html += `<h3 class="result-h">받아 든 이름들${boostBadge}</h3>`;
+    if (result.부모합성) {
+      extraBadges += ` <span class="pill warn boost-badge">👨‍👩‍👧 부모 합성 · ${result.부모합성.어순}</span>`;
+    }
+    html += `<h3 class="result-h">받아 든 이름들${extraBadges}</h3>`;
   }
 
   if (사주 && !태명만모드) {
@@ -286,6 +309,19 @@ function renderPersonResult(result, input) {
       <div class="cards tm-cards">
         ${t.후보들.map(renderTaemyungCard).join('')}
       </div>
+      <div class="tm-boost">
+        <h4 class="boost-h tm-boost-h">이 결을 더 받쳐주는 태명으로 다시 받기</h4>
+        <div class="boost-chips">
+          <button type="button" class="chip tm-chip" data-tm="food">🍯 콩알·간식</button>
+          <button type="button" class="chip tm-chip" data-tm="nature">🌿 자연·하늘</button>
+          <button type="button" class="chip tm-chip" data-tm="cute">🧸 귀여움·동글</button>
+          <button type="button" class="chip tm-chip" data-tm="hope">💗 복덩이·바람</button>
+          <button type="button" class="chip tm-chip" data-tm="jewel">💎 보석·반짝</button>
+          <button type="button" class="chip tm-chip" data-tm="meeting">🎁 깜짝·만남</button>
+          <button type="button" class="chip tm-chip" data-tm="sibling">👯 형제자매 운율</button>
+        </div>
+        <button type="button" class="boost-go tm-boost-go" id="tm-boost-go">고른 결로 태명 다시 받기</button>
+      </div>
       <p class="tm-note">태명은 보통 임신 5~7주차부터 부르기 시작해 출산 후 한동안 그대로 부르는 경우도 많아요. 너무 길게 짓기보단 한두 음절, 모음으로 끝나는 게 가장 부르기 좋습니다.</p>
     </section>`;
   }
@@ -299,6 +335,71 @@ function renderPersonResult(result, input) {
   // 보강 칩 토글 + 재추천
   $$('#out-person .boost-chip').forEach(c => {
     c.addEventListener('click', () => c.classList.toggle('on'));
+  });
+  // 태명 보강 칩 토글
+  $$('#out-person .tm-chip').forEach(c => {
+    c.addEventListener('click', () => c.classList.toggle('on'));
+  });
+  // 태명만 재추천
+  $('#tm-boost-go')?.addEventListener('click', () => {
+    const selected = $$('#out-person .tm-chip.on').map(c => c.dataset.tm);
+    if (!selected.length) {
+      const go = $('#tm-boost-go');
+      go.textContent = '먼저 결을 한 개 이상 골라주세요';
+      setTimeout(() => { go.textContent = '고른 결로 태명 다시 받기'; }, 1600);
+      return;
+    }
+    if (!lastPersonInput) return;
+    const next = { ...lastPersonInput };
+    lastPersonInput = next;
+    // 태명만 새로 받기
+    const tm = 태명작명({
+      예정월: next.생월,
+      키워드: next.키워드,
+      형제자매: next.형제자매,
+      윗아이: next.윗아이,
+      개수: next.구분 === '태명만' ? 10 : 6,
+      보강컨셉: selected,
+    });
+    // 결과의 태명 부분만 재렌더
+    const oldTmBlock = $('#out-person .taemyung-block');
+    if (!oldTmBlock) return;
+    // 재렌더하면서 보강 표시
+    const labels = {
+      food: '콩알·간식', nature: '자연·하늘', cute: '귀여움·동글',
+      hope: '복덩이·바람', jewel: '보석·반짝', meeting: '깜짝·만남', sibling: '형제자매 운율',
+    };
+    const boostLabel = selected.map(k => labels[k] || k).join('·');
+    const newHeader = `받아 든 태명 <span class="pill warn boost-badge">🌱 보강 · ${boostLabel}</span>`;
+    const isSolo = oldTmBlock.classList.contains('taemyung-solo');
+    const html = `
+      <header class="tm-head">
+        <h3 class="result-h tm-h">${isSolo ? newHeader : '태명 — 9개월 동안 부를 이름'}</h3>
+        ${!isSolo ? `<p class="result-sub"><span class="pill warn boost-badge">🌱 보강 · ${boostLabel}</span> 고른 결이 가산된 태명입니다.</p>` : ''}
+      </header>
+      <div class="cards tm-cards">${tm.후보들.map(renderTaemyungCard).join('')}</div>
+      <div class="tm-boost">
+        <h4 class="boost-h tm-boost-h">이 결을 더 받쳐주는 태명으로 다시 받기</h4>
+        <div class="boost-chips">
+          <button type="button" class="chip tm-chip ${selected.includes('food') ? 'on' : ''}" data-tm="food">🍯 콩알·간식</button>
+          <button type="button" class="chip tm-chip ${selected.includes('nature') ? 'on' : ''}" data-tm="nature">🌿 자연·하늘</button>
+          <button type="button" class="chip tm-chip ${selected.includes('cute') ? 'on' : ''}" data-tm="cute">🧸 귀여움·동글</button>
+          <button type="button" class="chip tm-chip ${selected.includes('hope') ? 'on' : ''}" data-tm="hope">💗 복덩이·바람</button>
+          <button type="button" class="chip tm-chip ${selected.includes('jewel') ? 'on' : ''}" data-tm="jewel">💎 보석·반짝</button>
+          <button type="button" class="chip tm-chip ${selected.includes('meeting') ? 'on' : ''}" data-tm="meeting">🎁 깜짝·만남</button>
+          <button type="button" class="chip tm-chip ${selected.includes('sibling') ? 'on' : ''}" data-tm="sibling">👯 형제자매 운율</button>
+        </div>
+        <button type="button" class="boost-go tm-boost-go" id="tm-boost-go">고른 결로 태명 다시 받기</button>
+      </div>
+      <p class="tm-note">태명은 보통 임신 5~7주차부터 부르기 시작해 출산 후 한동안 그대로 부르는 경우도 많아요.</p>
+    `;
+    oldTmBlock.innerHTML = html;
+    // 핸들러 재바인딩
+    oldTmBlock.querySelectorAll('.tm-chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('on')));
+    oldTmBlock.querySelector('#tm-boost-go')?.addEventListener('click', () => $('#tm-boost-go')?.click());
+    oldTmBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 즐겨찾기 버튼도 재마운트
+    mountFavoriteButtons();
   });
   $('#boost-go')?.addEventListener('click', () => {
     const selected = $$('#out-person .boost-chip.on').map(c => c.dataset.unse);
@@ -351,6 +452,24 @@ function renderPersonResult(result, input) {
     }</div>`,
   });
 }
+
+function renderResultActions() {
+  return `<div class="result-actions no-print">
+    <button type="button" class="result-act" data-act="print">📄 PDF로 저장</button>
+    <button type="button" class="result-act" data-act="open-fav">♡ 저장함 열기</button>
+  </div>`;
+}
+
+// 액션 버튼 이벤트 위임 (한 번만 등록)
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (!t) return;
+  if (t.dataset.act === 'print') {
+    window.print();
+  } else if (t.dataset.act === 'open-fav') {
+    $('#favorites-btn')?.click();
+  }
+});
 
 function renderUnse(u) {
   const 색 = (s) => s >= 75 ? 'var(--teal)' : s >= 55 ? 'var(--gold)' : s >= 35 ? 'var(--accent-soft)' : 'var(--muted)';
@@ -475,6 +594,7 @@ function initPetForm() {
 function renderPetResult(r) {
   const el = $('#out-pet');
   let html = `<section class="result-block">`;
+  html += renderResultActions();
   html += `<h3 class="result-h">우리 ${r.종류}에게 어울리는 이름들</h3>`;
   html += `<p class="result-sub">부르기 좋은 순으로 정렬했어요. 끝에 "이"가 붙은 친근형도 같이.</p>`;
   html += `<div class="cards pet-cards">`;
@@ -594,6 +714,7 @@ function initCompanyForm() {
 
 function renderNickResult(r) {
   const el = $('#out-company');
+  // PDF 액션은 닉네임에선 생략
   const 헤더타이틀 = r.게임명
     ? `${r.게임명} 닉네임 후보`
     : `${r.후보들[0]?.카테고리라벨 || '게임'} 닉네임 후보`;
@@ -642,6 +763,7 @@ function renderNickResult(r) {
 function renderCompanyResult(r) {
   const el = $('#out-company');
   let html = `<section class="result-block">`;
+  html += renderResultActions();
   html += `<h3 class="result-h">간판 위에 올려본 이름들</h3>`;
   html += `<div class="cards comp-cards">`;
   for (const c of r.후보들) {
@@ -677,6 +799,154 @@ function renderCompanyResult(r) {
 }
 
 // ─── init ────────────────────────────
+// ─── 즐겨찾기 + 공유 ────────────────
+export function mountFavoriteButtons() {
+  // 모든 결과 카드에 ♡ 버튼 마운트 (이미 있으면 스킵)
+  document.querySelectorAll('.name-card, .pet-card, .comp-card, .tm-card').forEach(card => {
+    if (card.querySelector('.card-actions')) return;
+    const data = extractCardData(card);
+    if (!data) return;
+    const id = makeId(data.type, data.이름, data.한자 || '');
+    const fav = isFavorite(id);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'card-actions';
+    wrap.innerHTML = `
+      <button class="card-act fav ${fav ? 'on' : ''}" data-act="fav" data-id="${id}" aria-label="저장">
+        ${fav ? '♥' : '♡'}
+      </button>
+      <button class="card-act share" data-act="share" aria-label="이미지로 저장">📷</button>
+    `;
+    card.appendChild(wrap);
+
+    wrap.querySelector('[data-act="fav"]').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const added = toggleFavorite({ id, ...data });
+      const btn = e.currentTarget;
+      btn.classList.toggle('on', added);
+      btn.textContent = added ? '♥' : '♡';
+      updateFavCount();
+    });
+    wrap.querySelector('[data-act="share"]').addEventListener('click', (e) => {
+      e.stopPropagation();
+      downloadShareCard(data);
+    });
+  });
+}
+
+function extractCardData(card) {
+  if (card.classList.contains('name-card')) {
+    return {
+      type: 'person',
+      이름: card.querySelector('.kor')?.textContent || '',
+      한자: card.querySelector('.hanja')?.textContent || '',
+      의미: card.querySelector('.nc-meaning')?.textContent || '',
+      코멘트: card.querySelector('.nc-first')?.textContent || '',
+    };
+  }
+  if (card.classList.contains('pet-card')) {
+    return {
+      type: 'pet',
+      이름: card.querySelector('h4')?.textContent?.split('·')[0].trim() || '',
+      의미: card.querySelector('.pet-yulae')?.textContent?.slice(0, 80) || '',
+      코멘트: card.querySelector('.badge')?.textContent || '',
+    };
+  }
+  if (card.classList.contains('comp-card')) {
+    return {
+      type: 'company',
+      이름: card.querySelector('h4')?.textContent || '',
+      의미: card.querySelector('.slogan')?.textContent || '',
+      코멘트: card.querySelector('.badge')?.textContent || '',
+    };
+  }
+  if (card.classList.contains('tm-card')) {
+    return {
+      type: 'taemyung',
+      이름: card.querySelector('.tm-name')?.textContent || '',
+      의미: card.querySelector('.tm-badge')?.textContent || '',
+      코멘트: card.querySelector('.tm-comment')?.textContent || '',
+    };
+  }
+  return null;
+}
+
+function updateFavCount() {
+  const el = $('#fav-count');
+  if (!el) return;
+  const n = getFavorites().length;
+  el.textContent = n;
+  el.style.display = n > 0 ? '' : 'none';
+}
+
+function initFavorites() {
+  updateFavCount();
+  const btn = $('#favorites-btn');
+  const modal = $('#fav-modal');
+  if (!btn || !modal) return;
+
+  btn.addEventListener('click', () => openFavModal());
+  modal.querySelectorAll('[data-close]').forEach(c => c.addEventListener('click', () => modal.hidden = true));
+  $('#fav-clear')?.addEventListener('click', () => {
+    if (confirm('저장한 이름을 전부 비울까요?')) {
+      clearAll();
+      updateFavCount();
+      renderFavList();
+    }
+  });
+}
+
+function openFavModal() {
+  const modal = $('#fav-modal');
+  if (!modal) return;
+  renderFavList();
+  modal.hidden = false;
+}
+
+function renderFavList() {
+  const list = $('#fav-list');
+  if (!list) return;
+  const items = getFavorites();
+  if (!items.length) {
+    list.innerHTML = `<p class="fav-empty">아직 저장한 이름이 없어요. 결과 카드의 <b>♡</b>를 눌러 마음에 든 이름을 모아보세요.</p>`;
+    return;
+  }
+  const typeLabel = { person: '인물·개명', pet: '반려동물', company: '회사·팀', taemyung: '태명' };
+  list.innerHTML = items.map(f => `
+    <article class="fav-item">
+      <div class="fav-main">
+        <span class="fav-type">${typeLabel[f.type] || f.type}</span>
+        <h4>${f.한자 ? `<span class="fav-han">${f.한자}</span>` : ''}<span>${f.이름}</span></h4>
+        ${f.의미 ? `<p class="fav-meaning">${f.의미}</p>` : ''}
+      </div>
+      <div class="fav-acts">
+        <button class="card-act share" data-share-id="${f.id}" aria-label="이미지">📷</button>
+        <button class="card-act remove" data-remove="${f.id}" aria-label="제거">×</button>
+      </div>
+    </article>
+  `).join('');
+  list.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', e => {
+    removeFavorite(e.currentTarget.dataset.remove);
+    updateFavCount();
+    renderFavList();
+    // 결과 페이지의 ♡ 상태도 갱신
+    document.querySelectorAll('.card-act.fav').forEach(btn => {
+      if (btn.dataset.id === e.currentTarget.dataset.remove) {
+        btn.classList.remove('on');
+        btn.textContent = '♡';
+      }
+    });
+  }));
+  list.querySelectorAll('[data-share-id]').forEach(b => b.addEventListener('click', e => {
+    const id = e.currentTarget.dataset.shareId;
+    const item = getFavorites().find(f => f.id === id);
+    if (item) downloadShareCard(item);
+  }));
+}
+
+// 전역 공개 (재렌더 시 호출)
+window._mountFavoriteButtons = mountFavoriteButtons;
+
 window.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initTabs();
@@ -684,6 +954,15 @@ window.addEventListener('DOMContentLoaded', () => {
   initPersonForm();
   initPetForm();
   initCompanyForm();
+  initFavorites();
+  // 결과 렌더 후 자동으로 ♡ 마운트되도록 MutationObserver
+  const observer = new MutationObserver(() => {
+    mountFavoriteButtons();
+  });
+  ['out-person', 'out-pet', 'out-company'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el, { childList: true, subtree: true });
+  });
   // 첫 진입 시 홈 탭 활성
   $('.tab-btn[data-tab="home"]')?.click();
 });

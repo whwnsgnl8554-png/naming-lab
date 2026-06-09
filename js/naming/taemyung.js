@@ -77,8 +77,9 @@ export function 태명작명(input) {
     예정월 = null,
     키워드 = [],
     형제자매 = false,
-    윗아이 = '',      // 형제자매 시 윗아이 태명 또는 본명
+    윗아이 = '',
     개수 = 6,
+    보강컨셉 = [],     // ['food', 'nature', ...] 사용자가 보강하고 싶은 컨셉
   } = input;
 
   // 풀 가중치
@@ -97,6 +98,11 @@ export function 태명작명(input) {
 
   // 형제자매
   if (형제자매) w.sibling += 3;
+
+  // 사용자 보강 컨셉 — 매우 강하게 가산 (+5)
+  for (const c of 보강컨셉) {
+    if (w[c] != null) w[c] += 5;
+  }
 
   // 풀별 가중 샘플링
   const 후보 = [];
