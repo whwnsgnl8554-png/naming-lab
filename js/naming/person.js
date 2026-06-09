@@ -8,6 +8,7 @@
 
 import { HANJA, HANJA_BY_OHAENG } from '../data/hanja.js';
 import { 사주오행분석, 띠 } from '../util/saju.js';
+import { 운세분석 } from '../util/unse.js';
 import { 음오행, 수리길흉 } from '../data/ohaeng.js';
 import { 자모분리 } from '../util/hangul.js';
 import { 인물종합점수, 발음점수, 시대성점수, 희소성점수 } from '../util/score.js';
@@ -97,11 +98,13 @@ export function 인물작명(input) {
   let 부족오행 = [];
   let 충만오행 = [];
   let 띠정보 = null;
+  let 운세 = null;
   if (생년) {
     사주 = 사주오행분석({ year: 생년, month: 생월 || 1, day: 생일 || 1, hour: 생시 });
     부족오행 = 사주.부족;
     충만오행 = 사주.충만;
     띠정보 = 띠(생년);
+    운세 = 운세분석(사주);
   }
 
   // 한자 미사용 → 순한글 / 한국 인기 풀에서 작명
@@ -151,6 +154,7 @@ export function 인물작명(input) {
     구분,
     사주,
     띠: 띠정보,
+    운세,
     후보들,
   };
 }

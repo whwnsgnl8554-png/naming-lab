@@ -469,6 +469,101 @@ small.hint.warn { color: var(--gold); }
   border-color: var(--teal);
 }
 
+/* ─── 운세 섹션 ─── */
+.unse-block {
+  margin: 4px 0 26px;
+  padding: 22px 22px 18px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--teal) 10%, transparent), transparent 55%),
+    var(--card);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 12px 12px 0;
+}
+.unse-head { margin-bottom: 14px; }
+.unse-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+.unse-h::before { content: '🔮'; font-size: 20px; }
+.unse-block .result-sub { font-size: 13px; line-height: 1.5; }
+
+.sinsal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.sinsal-tag {
+  display: inline-flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: help;
+}
+
+.unse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px 16px;
+}
+.unse-card {
+  padding: 10px 0 6px;
+}
+.unse-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.unse-ico { font-size: 16px; }
+.unse-name { color: var(--ink); font-weight: 500; flex: 1; }
+.unse-num {
+  font-family: 'Gowun Batang', serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+.unse-num small { font-weight: 400; font-size: 11px; color: var(--ink-soft); margin-left: 4px; }
+.unse-bar {
+  height: 6px;
+  background: var(--card-elev);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 6px 0 6px;
+}
+.unse-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+.unse-cm {
+  font-family: 'Nanum Pen Script', cursive;
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.unse-summary {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  background: var(--card-elev);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
 /* ─── 태명 섹션 ─── */
 .taemyung-block {
   margin-top: 36px;

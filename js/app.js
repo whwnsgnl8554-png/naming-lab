@@ -246,6 +246,11 @@ function renderPersonResult(result, input) {
       html += `<div class="saju-row"><span class="lbl">보충</span><span>부족한 <b>${사주.부족.map(o => OHAENG_KO[o]).join('·')}</b> 기운을 채워줄 글자 위주로 추천했어요.</span></div>`;
     }
     html += `</div>`;
+
+    // 운세 게이지 섹션
+    if (result.운세) {
+      html += renderUnse(result.운세);
+    }
   }
 
   if (!태명만모드) {
@@ -305,6 +310,48 @@ function renderPersonResult(result, input) {
       `).join('')
     }</div>`,
   });
+}
+
+function renderUnse(u) {
+  const 색 = (s) => s >= 75 ? 'var(--teal)' : s >= 55 ? 'var(--gold)' : s >= 35 ? 'var(--accent-soft)' : 'var(--muted)';
+  const 톤 = (s) => s >= 75 ? '강함' : s >= 55 ? '있음' : s >= 35 ? '평이' : '약함';
+
+  let html = `<section class="unse-block">
+    <header class="unse-head">
+      <h3 class="result-h unse-h">이름이 부를 운 — 사주 8가지 결</h3>
+      <p class="result-sub">일간을 중심으로 십성(十星)과 신살(神煞)을 단순화해 8가지 결을 점수화했어요. 학파마다 해석이 달라 절대값이 아니라 <b>상대적 기운의 흐름</b>으로 봐주세요.</p>
+    </header>`;
+
+  // 신살 뱃지
+  if (u.신살?.length) {
+    html += `<div class="sinsal-row">`;
+    for (const s of u.신살) {
+      html += `<span class="sinsal-tag" title="${s.설명}">${s.이름}</span>`;
+    }
+    html += `</div>`;
+  }
+
+  // 8개 운세 막대
+  html += `<div class="unse-grid">`;
+  for (const k of Object.keys(u.운세)) {
+    const it = u.운세[k];
+    const c = 색(it.점수);
+    html += `<article class="unse-card">
+      <div class="unse-line">
+        <span class="unse-ico">${it.아이콘}</span>
+        <span class="unse-name">${it.이름}</span>
+        <span class="unse-num" style="color:${c}">${it.점수}<small>· ${톤(it.점수)}</small></span>
+      </div>
+      <div class="unse-bar"><i style="width:${it.점수}%; background:${c}"></i></div>
+      <p class="unse-cm">${it.코멘트}</p>
+    </article>`;
+  }
+  html += `</div>`;
+
+  // 종합 한 줄
+  html += `<p class="unse-summary">${u.종합}</p>`;
+  html += `</section>`;
+  return html;
 }
 
 function renderTaemyungCard(c) {
