@@ -564,6 +564,63 @@ small.hint.warn { color: var(--gold); }
   line-height: 1.6;
 }
 
+.unse-boost {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--card-border);
+}
+.boost-h {
+  font-family: 'Gowun Batang', serif;
+  font-size: 15px;
+  margin: 0 0 4px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.boost-h::before { content: '✦'; color: var(--teal); }
+.boost-sub {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+.boost-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.boost-chip {
+  font-size: 12.5px;
+  padding: 5px 11px;
+}
+.boost-chip.on {
+  background: var(--teal);
+  border-color: var(--teal);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--teal) 30%, transparent);
+}
+.boost-go {
+  width: 100%;
+  background: color-mix(in srgb, var(--teal) 14%, var(--card-elev));
+  color: var(--teal);
+  border: 1px solid color-mix(in srgb, var(--teal) 40%, var(--card-border));
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.boost-go:hover {
+  background: var(--teal);
+  color: #fff8e8;
+}
+.boost-badge {
+  font-size: 12px !important;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
 /* ─── 태명 섹션 ─── */
 .taemyung-block {
   margin-top: 36px;

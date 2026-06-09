@@ -227,7 +227,12 @@ function renderPersonResult(result, input) {
   const 태명만모드 = result._구분 === '태명만';
   let html = `<section class="result-block">`;
   if (!태명만모드) {
-    html += `<h3 class="result-h">받아 든 이름들</h3>`;
+    let boostBadge = '';
+    if (result._보강운세?.length && result.운세) {
+      const labels = result._보강운세.map(k => result.운세.운세[k]?.이름 || k).join('·');
+      boostBadge = ` <span class="pill ok boost-badge" title="이 운을 받치는 한자에 가중치를 추가했어요">✦ 보강 · ${labels}</span>`;
+    }
+    html += `<h3 class="result-h">받아 든 이름들${boostBadge}</h3>`;
   }
 
   if (사주 && !태명만모드) {
@@ -291,6 +296,41 @@ function renderPersonResult(result, input) {
   el.innerHTML = html;
   $('#person-redo')?.addEventListener('click', () => $('#person-form')?.requestSubmit());
 
+  // 보강 칩 토글 + 재추천
+  $$('#out-person .boost-chip').forEach(c => {
+    c.addEventListener('click', () => c.classList.toggle('on'));
+  });
+  $('#boost-go')?.addEventListener('click', () => {
+    const selected = $$('#out-person .boost-chip.on').map(c => c.dataset.unse);
+    if (!selected.length) {
+      const go = $('#boost-go');
+      go.textContent = '먼저 운을 한 개 이상 골라주세요';
+      setTimeout(() => { go.textContent = '고른 운으로 이름 다시 받기'; }, 1600);
+      return;
+    }
+    if (!lastPersonInput) return;
+    const next = { ...lastPersonInput, 보강운세: selected };
+    lastPersonInput = next;
+    renderLoading('out-person', `${selected.length}가지 운을 받치는 이름을 새로 골라보는 중…`);
+    setTimeout(() => {
+      const result = 인물작명(next);
+      if ((next.구분 === '신생아' && next.태명함께) || next.구분 === '태명만') {
+        result.태명 = 태명작명({
+          예정월: next.생월,
+          키워드: next.키워드,
+          형제자매: next.형제자매,
+          윗아이: next.윗아이,
+          개수: next.구분 === '태명만' ? 10 : 6,
+        });
+      }
+      result._구분 = next.구분;
+      result._보강운세 = selected;
+      renderPersonResult(result, next);
+      // 결과로 이동
+      $('#out-person')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 380);
+  });
+
   // AI 추천 더 받기 — 본명 추천이 있는 모드에서만
   if (태명만모드) return;
   mountExtraButton(el, {
@@ -350,6 +390,20 @@ function renderUnse(u) {
 
   // 종합 한 줄
   html += `<p class="unse-summary">${u.종합}</p>`;
+
+  // 보강 모드 — "이 운 받쳐서 다시 받기"
+  html += `<div class="unse-boost">
+    <h4 class="boost-h">이 운을 더 받치는 이름으로 다시 받기</h4>
+    <p class="boost-sub">보강하고 싶은 운을 골라주세요(여러 개). 해당 의미의 한자에 가중치가 추가돼 이름이 다시 추천됩니다.</p>
+    <div class="boost-chips">`;
+  for (const k of Object.keys(u.운세)) {
+    const it = u.운세[k];
+    html += `<button type="button" class="chip boost-chip" data-unse="${k}">${it.아이콘} ${it.이름}</button>`;
+  }
+  html += `</div>
+    <button type="button" class="boost-go" id="boost-go">고른 운으로 이름 다시 받기</button>
+  </div>`;
+
   html += `</section>`;
   return html;
 }

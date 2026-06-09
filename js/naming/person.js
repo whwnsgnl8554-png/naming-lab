@@ -13,6 +13,7 @@ import { 음오행, 수리길흉 } from '../data/ohaeng.js';
 import { 자모분리 } from '../util/hangul.js';
 import { 인물종합점수, 발음점수, 시대성점수, 희소성점수 } from '../util/score.js';
 import { PERSON_KEYWORDS } from '../data/keywords.js';
+import { 보강가중 } from '../data/unse-hanja.js';
 import { SYLLABLES, POPULAR_PERSON_NAMES } from '../data/syllables.js';
 
 // 성씨(한 글자) 모집단
@@ -41,6 +42,8 @@ function 한자가중치(h, ctx) {
       }
     }
   }
+  // 운세 보강 — 사용자가 보강하고 싶은 운세에 해당하는 한자 +12씩
+  w += 보강가중(ctx.보강운세, h);
   return w;
 }
 
@@ -113,7 +116,7 @@ export function 인물작명(input) {
   }
 
   // 한자 후보 가중치 산정
-  const ctx = { 부족오행, 충만오행, 성별, 키워드들: 키워드 };
+  const ctx = { 부족오행, 충만오행, 성별, 키워드들: 키워드, 보강운세: input.보강운세 || [] };
   const 가중리스트 = HANJA.map(h => ({ h, w: 한자가중치(h, ctx) }));
   가중리스트.sort((a, b) => b.w - a.w);
 
