@@ -197,6 +197,7 @@ function initPersonForm() {
       성별: fd.get('성별'),
       한자사용: fd.get('한자사용') === 'on',
       옛스러움제외: fd.get('옛스러움제외') === 'on',
+      인기트렌드: fd.get('인기트렌드') === 'on',
       음절: Number(fd.get('음절')),
       키워드: selectedChips('person-keywords'),
     };
@@ -608,12 +609,19 @@ function renderTaemyungCard(c) {
 }
 
 function renderPersonCard(c) {
+  // 인기 이름 뱃지
+  let popBadge = '';
+  if (c.인기) {
+    const 시대표 = c.인기.연도 >= 2020 ? '최신' : c.인기.연도 >= 2014 ? '트렌디' : c.인기.연도 >= 2000 ? '클래식' : '레트로';
+    popBadge = `<span class="pop-badge" title="대법원 자녀 출생신고 통계 기반">🏆 ${c.인기.연도} 인기 ${c.인기.순위}위 · ${시대표}</span>`;
+  }
   return `
     <article class="name-card">
       <header class="nc-head">
         <h4 class="nc-han">${c.한자 ? `<span class="hanja">${c.한자}</span>` : ''}<span class="kor">${c.풀네임 || c.한글}</span></h4>
-        <span class="nc-score" title="발음·시대성·희소성 종합">${c.종합점수}<small>/100</small></span>
+        <span class="nc-score" title="발음·시대성·희소성·인기 종합">${c.종합점수}<small>/100</small></span>
       </header>
+      ${popBadge}
       <p class="nc-meaning">${c.뜻}</p>
       <p class="nc-first">${c.첫인상}</p>
       <div class="nc-grid">

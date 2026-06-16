@@ -811,6 +811,21 @@ small.hint.warn { color: var(--gold); }
 .step-card .field { margin-bottom: var(--s-3); }
 .step-card .field:last-child { margin-bottom: 0; }
 
+/* ─── 인기 이름 뱃지 ─── */
+.pop-badge {
+  display: inline-block;
+  margin: var(--s-1) 0 var(--s-2);
+  padding: 3px var(--s-2);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 18%, transparent), color-mix(in srgb, var(--coral) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+  color: var(--gold);
+  border-radius: var(--r-full);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: help;
+}
+
 /* ─── 빈 결과 안내 ─── */
 .empty-result {
   background: var(--paper-2);
@@ -1226,6 +1241,7 @@ small.hint.warn { color: var(--gold); }
         <div class="checks">
           <label><input type="checkbox" name="한자사용" checked> 한자 포함해서 짓기</label>
           <label><input type="checkbox" name="옛스러움제외" checked> 옛스러운 이름 제외 (현대 트렌드 우선)</label>
+          <label><input type="checkbox" name="인기트렌드" checked> 🏆 대법원 인기 이름 우선 (연도별 선호도 반영)</label>
         </div>
         <div class="row" style="margin-top: 16px;">
           <div>
