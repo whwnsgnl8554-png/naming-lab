@@ -15,7 +15,14 @@ import { 인물종합점수, 발음점수, 시대성점수, 희소성점수 } fr
 import { PERSON_KEYWORDS } from '../data/keywords.js';
 import { 보강가중 } from '../data/unse-hanja.js';
 import { 뜻에서한자훈 } from '../data/foreign.js';
-import { 인기가중, 인기랭킹, POP_SYL_M, POP_SYL_F } from '../data/popular-names.js';
+import { 인기가중, 인기랭킹, POP_SYL_M, POP_SYL_F, POPULAR_M, POPULAR_F, PREFERRED_HANJA_PAIRS } from '../data/popular-names.js';
+
+// 작명에 잘 안 쓰는 한자 — 가중치 강하게 감점 (실재하더라도 자녀 이름엔 어색)
+const 어색한자 = new Set([
+  '阿', '兒', '我', '彗', '蘿', '岸', '寅',  // 의미가 어색
+  '蔡', '埰',                                // 부수 안 어울림
+  '蕙', '璘',                                // 사용 빈도 낮음
+]);
 import { SYLLABLES, POPULAR_PERSON_NAMES } from '../data/syllables.js';
 
 // 성씨(한 글자) 모집단
@@ -28,6 +35,8 @@ function 성_자모(성) {
 // 한자 후보 점수
 function 한자가중치(h, ctx) {
   let w = 0;
+  // 어색한 한자 강한 감점 — 작명에 안 쓰는 글자
+  if (어색한자.has(h.자)) w -= 25;
   // 부족 오행이면 +10
   if (ctx.부족오행.includes(h.오)) w += 10;
   // 충만 오행이면 -3 (이미 많은 걸 또 보태진 않음)
@@ -223,6 +232,20 @@ export function 인물작명(input) {
     }
   }
 
+  // ── 인기 이름 우선 추출 — 트렌드 모드 + 성별 있으면 1~2등 보장 ──
+  if (인기트렌드 && 성별 && 성별 !== 'u' && 음절 === 2 && 한자사용 && !부모합성 && !이름지정) {
+    const 인기카드 = 인기풀에서뽑기({
+      성별, 성, 출생연도: 생년,
+      ctx, 사주, 띠정보, 키워드,
+    });
+    // 인기 카드를 앞쪽에 삽입 (중복 제거) — 1~3등 보장
+    const 기존이름 = new Set(후보들.map(c => c.한글));
+    const 새인기 = 인기카드.filter(c => !기존이름.has(c.한글)).slice(0, 3);
+    // 인기 카드는 종합점수에 강한 보너스 +12
+    for (const c of 새인기) c.종합점수 = Math.min(100, c.종합점수 + 12);
+    후보들.push(...새인기);
+  }
+
   // 점수 내림차순 정렬
   후보들.sort((a, b) => b.종합점수 - a.종합점수);
   return {
@@ -230,9 +253,68 @@ export function 인물작명(input) {
     사주,
     띠: 띠정보,
     운세,
-    후보들,
+    후보들: 후보들.slice(0, 5),
     외국인: 외국인모드 ? { 본명원어, 본명한국음, 본명뜻, 변환방식, 매칭훈: 의미훈 } : null,
   };
+}
+
+// 인기 이름 풀에서 직접 뽑아 한자 매칭 — 부모 출생연도 가까운 시대 우선
+function 인기풀에서뽑기({ 성별, 성, 출생연도, ctx, 사주, 띠정보, 키워드 }) {
+  const map = 성별 === 'm' ? POPULAR_M : POPULAR_F;
+  // 출생연도 가까운 순으로 연도 정렬
+  const 연도들 = Object.keys(map).map(Number);
+  const 기준 = 출생연도 || 2024;
+  연도들.sort((a, b) => Math.abs(a - 기준) - Math.abs(b - 기준));
+
+  // 가장 가까운 연도의 인기 TOP 10에서 무작위 5개 추출
+  const 풀 = (map[연도들[0]] || []).slice(0, 10);
+  const 셔플 = [...풀].sort(() => Math.random() - 0.5).slice(0, 5);
+
+  const 결과 = [];
+  for (const 한글이름 of 셔플) {
+    if (한글이름.length !== 2) continue;
+
+    let 선택 = null;
+
+    // 1차 — 자주 쓰는 한자 페어 (작명서·통계 기반)
+    const pairs = PREFERRED_HANJA_PAIRS[한글이름] || [];
+    for (const [c1, c2] of pairs) {
+      const h1 = HANJA.find(h => h.자 === c1);
+      const h2 = HANJA.find(h => h.자 === c2);
+      if (h1 && h2 && h1.자 !== h2.자) {
+        선택 = { 첫: h1, 둘: h2 };
+        break;
+      }
+    }
+
+    // 2차 — 음 매칭 폴백
+    if (!선택) {
+      const [음1, 음2] = [한글이름[0], 한글이름[1]];
+      const 첫후보 = HANJA.filter(h => h.음 === 음1)
+        .map(h => ({ h, w: 한자가중치(h, ctx) }))
+        .sort((a, b) => b.w - a.w);
+      const 둘후보 = HANJA.filter(h => h.음 === 음2)
+        .map(h => ({ h, w: 한자가중치(h, ctx) }))
+        .sort((a, b) => b.w - a.w);
+
+      if (!첫후보.length || !둘후보.length) continue;
+
+      outer: for (const a of 첫후보.slice(0, 5)) {
+        for (const b of 둘후보.slice(0, 5)) {
+          if (a.h.자 === b.h.자) continue;
+          선택 = { 첫: a.h, 둘: b.h };
+          break outer;
+        }
+      }
+    }
+
+    if (!선택) continue;
+    결과.push(이름카드만들기({
+      첫: 선택.첫, 둘: 선택.둘, 성, 한글: 한글이름,
+      사주, 띠정보, 키워드, 성별, 출생연도, 인기트렌드: true,
+    }));
+  }
+  return 결과;
 }
 
 function lookupHanja(자) {
