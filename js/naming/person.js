@@ -16,6 +16,7 @@ import { PERSON_KEYWORDS } from '../data/keywords.js';
 import { 보강가중 } from '../data/unse-hanja.js';
 import { 뜻에서한자훈 } from '../data/foreign.js';
 import { 인기가중, 인기랭킹, POP_SYL_M, POP_SYL_F, POPULAR_M, POPULAR_F, PREFERRED_HANJA_PAIRS } from '../data/popular-names.js';
+import { 조합안전한가 } from '../data/bad-combos.js';
 
 // 작명에 잘 안 쓰는 한자 — 가중치 강하게 감점 (실재하더라도 자녀 이름엔 어색)
 const 어색한자 = new Set([
@@ -246,14 +247,17 @@ export function 인물작명(input) {
     후보들.push(...새인기);
   }
 
+  // 놀림 조합·부적절 어감 필터 — 성+이름 조합 검증
+  const 안전한후보들 = 성 ? 후보들.filter(c => 조합안전한가(성, c.한글)) : 후보들;
+
   // 점수 내림차순 정렬
-  후보들.sort((a, b) => b.종합점수 - a.종합점수);
+  안전한후보들.sort((a, b) => b.종합점수 - a.종합점수);
   return {
     구분,
     사주,
     띠: 띠정보,
     운세,
-    후보들: 후보들.slice(0, 5),
+    후보들: 안전한후보들.slice(0, 5),
     외국인: 외국인모드 ? { 본명원어, 본명한국음, 본명뜻, 변환방식, 매칭훈: 의미훈 } : null,
   };
 }
